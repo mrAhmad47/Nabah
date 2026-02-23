@@ -7,6 +7,8 @@ import 'alerts_screen.dart';
 import 'report_incident_screen.dart';
 import 'ai_analysis_screen.dart';
 import '../services/geolocation_service.dart';
+import '../services/directions_service.dart';
+import '../services/route_safety_news_service.dart';
 import 'package:latlong2/latlong.dart' as latlong2;
 
 class HomeMapScreen extends StatefulWidget {
@@ -21,6 +23,12 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
   String _currentLocationText = 'Getting location...';
   latlong2.LatLng? _currentLocation;
 
+  // Live news state
+  bool _isLoadingNews = true;
+  List<SafetyWarning> _liveAlerts = [];
+  int _areaSafetyScore = 80;
+  String _lastUpdated = '';
+
   @override
   void initState() {
     super.initState();
@@ -28,12 +36,11 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
   }
 
   Future<void> _loadCurrentLocation() async {
-    // Try to get real GPS location
     final location = await _geoService.getCurrentLocation();
-    
+    String address;
+
     if (location != null) {
-      // Get address from coordinates
-      final address = await _geoService.getAddressFromCoordinates(location);
+      address = await _geoService.getAddressFromCoordinates(location);
       if (mounted) {
         setState(() {
           _currentLocation = location;
@@ -41,7 +48,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
         });
       }
     } else {
-      // Fallback to default
+      address = 'Lagos, Nigeria';
       if (mounted) {
         setState(() {
           _currentLocation = GeolocationService.defaultLocation;
@@ -49,13 +56,77 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
         });
       }
     }
+
+    // Once we have an address, fetch live safety news for the area
+    await _fetchAreaSafetyNews(address);
+  }
+
+  Future<void> _fetchAreaSafetyNews(String locationAddress) async {
+    if (!mounted) return;
+    setState(() => _isLoadingNews = true);
+
+    try {
+      // Create a dummy RouteResult representing just the current location
+      final fakeRoute = RouteResult(
+        routeIndex: 0,
+        routeName: 'Area Safety Check',
+        originAddress: locationAddress,
+        destinationAddress: locationAddress,
+        distanceMeters: 0,
+        distanceText: '0 km',
+        durationSeconds: 0,
+        durationText: '0 min',
+        routePoints: _currentLocation != null ? [_currentLocation!] : [],
+        steps: [],
+      );
+
+      final analysis = await RouteSafetyNewsService.instance
+          .analyzeRouteSafety(route: fakeRoute);
+
+      if (!mounted) return;
+      setState(() {
+        _liveAlerts = analysis.warnings;
+        _areaSafetyScore = analysis.safetyScore;
+        _isLoadingNews = false;
+        _lastUpdated = 'Just now';
+      });
+    } catch (e) {
+      debugPrint('⚠️ Home news fetch failed: $e');
+      if (!mounted) return;
+      setState(() {
+        _isLoadingNews = false;
+        _lastUpdated = 'Unavailable';
+      });
+    }
+  }
+
+  /// Dynamic risk label and color based on safety score
+  String get _riskLabel {
+    if (_areaSafetyScore >= 80) return 'LOW RISK';
+    if (_areaSafetyScore >= 60) return 'MODERATE RISK';
+    if (_areaSafetyScore >= 40) return 'HIGH RISK';
+    return 'DANGER ZONE';
+  }
+
+  Color get _riskColor {
+    if (_areaSafetyScore >= 80) return AppTheme.neonGreen;
+    if (_areaSafetyScore >= 60) return const Color(0xFFFFB800);
+    return AppTheme.dangerRed;
+  }
+
+  String get _riskSummary {
+    if (_liveAlerts.isEmpty) {
+      return 'No major incidents detected nearby. Stay vigilant.';
+    }
+    final types = _liveAlerts.map((a) => a.type.displayName).toSet().join(', ');
+    return '${_liveAlerts.length} alert${_liveAlerts.length > 1 ? 's' : ''} detected nearby: $types.';
   }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Static Map Background (Reverted)
+        // Static Map Background
         Positioned.fill(
           child: Container(
             decoration: BoxDecoration(
@@ -66,7 +137,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                 ),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.6), 
+                  Colors.black.withOpacity(0.6),
                   BlendMode.darken,
                 ),
               ),
@@ -86,7 +157,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                   Text(
+                  Text(
                     'SafeRoute',
                     style: AppTheme.titleStyle.copyWith(fontSize: 22, letterSpacing: 1.5),
                   ),
@@ -107,13 +178,13 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
 
         // Main Content Overlay
         Positioned.fill(
-          top: 100, // Below AppBar
+          top: 100,
           child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 100), 
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Current Location Item
+                // Current Location
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -153,31 +224,78 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Card: Current Area Safety Summary
+                // Dynamic Area Safety Card
                 NeonCard(
                   hasGlow: true,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'LOW RISK',
-                        style: AppTheme.titleStyle.copyWith(
-                          color: AppTheme.neonGreen,
-                          fontSize: 20,
-                          letterSpacing: 1.0,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _isLoadingNews ? 'SCANNING AREA...' : _riskLabel,
+                              style: AppTheme.titleStyle.copyWith(
+                                color: _isLoadingNews ? Colors.grey : _riskColor,
+                                fontSize: 20,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ),
+                          if (!_isLoadingNews) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: _riskColor.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: _riskColor.withOpacity(0.4)),
+                              ),
+                              child: Text(
+                                '$_areaSafetyScore%',
+                                style: TextStyle(
+                                  color: _riskColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ] else
+                            const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppTheme.neonGreen,
+                              ),
+                            ),
+                        ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
+                      // Safety score bar
+                      if (!_isLoadingNews) ...[
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: _areaSafetyScore / 100,
+                            backgroundColor: Colors.white12,
+                            valueColor: AlwaysStoppedAnimation<Color>(_riskColor),
+                            minHeight: 6,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
                       Text(
-                        'The area is currently safe. No major incidents reported nearby.',
+                        _isLoadingNews
+                            ? 'Fetching live safety data for your area...'
+                            : _riskSummary,
                         style: AppTheme.bodyStyle.copyWith(color: Colors.white),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Updated 2 mins ago',
+                        _isLoadingNews ? '' : 'Updated: $_lastUpdated',
                         style: AppTheme.bodyStyle.copyWith(
-                          color: AppTheme.neonGreen.withOpacity(0.7),
-                          fontSize: 14,
+                          color: _riskColor.withOpacity(0.7),
+                          fontSize: 12,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -185,11 +303,10 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                         height: 36,
                         child: OutlinedButton(
                           onPressed: () {
-                             // Contextual detail view
-                             Navigator.push(
-                               context, 
-                               MaterialPageRoute(builder: (context) => const AlertsScreen()) // For now specific location detail
-                             );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const AlertsScreen()),
+                            );
                           },
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: AppTheme.accentBlue),
@@ -208,12 +325,11 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Single Button: Start Navigation
+                // Start Navigation
                 NeonButton(
                   text: 'Start SafeRoute Navigation',
                   isPrimary: true,
                   onPressed: () {
-                    // Navigate to Route Selection Screen
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const RouteSelectionScreen()),
@@ -238,7 +354,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                // Horizontal Shortcut Menu (4 items now)
+                // Shortcut Menu
                 Row(
                   children: [
                     Expanded(
@@ -293,58 +409,89 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildStatItem('12', 'Incidents Today', Colors.white),
+                        _buildStatItem(
+                          _liveAlerts.isEmpty ? '0' : '${_liveAlerts.length}',
+                          'Alerts Nearby',
+                          Colors.white,
+                        ),
                         const VerticalDivider(color: Colors.white24, width: 1),
-                        _buildStatItem('47', 'Safe Routes', Colors.white),
+                        _buildStatItem('$_areaSafetyScore%', 'Safety Score', _riskColor),
                         const VerticalDivider(color: Colors.white24, width: 1),
-                        _buildStatItem('Yes', 'AI Active', AppTheme.neonGreen),
+                        _buildStatItem(
+                          _isLoadingNews ? '...' : 'Live',
+                          'AI Status',
+                          AppTheme.neonGreen,
+                        ),
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
 
-                // Recent Alerts Section
+                // Live Alerts Section
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.6),
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16)
-                    )
+                      topRight: Radius.circular(16),
+                    ),
                   ),
                   child: Column(
                     children: [
-                       Text(
-                        'Recent Verified Safety Alerts',
-                        style: AppTheme.titleStyle.copyWith(fontSize: 18),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Live Safety Alerts',
+                            style: AppTheme.titleStyle.copyWith(fontSize: 18),
+                          ),
+                          if (_isLoadingNews)
+                            const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppTheme.neonGreen,
+                              ),
+                            )
+                          else
+                            GestureDetector(
+                              onTap: () => _fetchAreaSafetyNews(_currentLocationText),
+                              child: const Icon(Icons.refresh, color: AppTheme.neonGreen, size: 20),
+                            ),
+                        ],
                       ),
                       const SizedBox(height: 12),
-                      _buildAlertCard(
-                        icon: Icons.gpp_maybe,
-                        iconColor: Colors.amber,
-                        bgHex: 0xFFFFA000, 
-                        title: 'Theft Reported',
-                        subtitle: 'Market St & 5th St - 0.5 mi away',
-                        time: '15m ago',
-                      ),
-                      _buildAlertCard(
-                        icon: Icons.traffic,
-                        iconColor: AppTheme.accentBlue,
-                        bgHex: 0xFF00B4FF,
-                        title: 'Road Closure',
-                        subtitle: 'Main St Bridge - 1.2 mi away',
-                        time: '45m ago',
-                      ),
-                      _buildAlertCard(
-                        icon: Icons.gpp_maybe,
-                        iconColor: Colors.amber,
-                        bgHex: 0xFFFFA000,
-                        title: 'Suspicious Activity',
-                        subtitle: 'Union Square - 0.8 mi away',
-                        time: '1h ago',
-                      ),
+
+                      // Show live alerts or fallback message
+                      if (_isLoadingNews)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child: Column(
+                            children: [
+                              CircularProgressIndicator(color: AppTheme.neonGreen),
+                              SizedBox(height: 12),
+                              Text(
+                                'Fetching live news from area...',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        )
+                      else if (_liveAlerts.isEmpty)
+                        _buildAlertCard(
+                          icon: Icons.verified_user,
+                          iconColor: AppTheme.neonGreen,
+                          bgHex: 0xFF39FF14,
+                          title: 'Area Clear',
+                          subtitle: 'No security incidents detected near you',
+                          time: _lastUpdated,
+                        )
+                      else
+                        ..._liveAlerts.take(4).map((alert) => _buildLiveAlertCard(alert)),
+
                       TextButton(
                         onPressed: () {
                           Navigator.push(
@@ -364,8 +511,8 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
             ),
           ),
         ),
-        
-        // SOS Button Positioned
+
+        // SOS Button
         Positioned(
           right: 16,
           bottom: 24,
@@ -377,6 +524,104 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
         ),
       ],
     );
+  }
+
+  /// Alert card for LIVE news items from N-ATLaS
+  Widget _buildLiveAlertCard(SafetyWarning alert) {
+    final iconData = _warningIcon(alert.type);
+    final color = _warningColor(alert.type);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(iconData, color: color, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  alert.type.displayName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  '${alert.location} — ${alert.description}',
+                  style: TextStyle(
+                    color: AppTheme.neonGreen.withOpacity(0.7),
+                    fontSize: 12,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                alert.recencyLabel.isNotEmpty ? alert.recencyLabel : 'Live',
+                style: const TextStyle(color: Colors.white54, fontSize: 11),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '-${alert.severityImpact}%',
+                  style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconData _warningIcon(WarningType type) {
+    switch (type) {
+      case WarningType.crime: return Icons.gpp_maybe;
+      case WarningType.kidnapping: return Icons.warning_amber;
+      case WarningType.badRoad: return Icons.construction;
+      case WarningType.weather: return Icons.thunderstorm;
+      case WarningType.traffic: return Icons.traffic;
+      case WarningType.accident: return Icons.car_crash;
+    }
+  }
+
+  Color _warningColor(WarningType type) {
+    switch (type) {
+      case WarningType.crime: return Colors.amber;
+      case WarningType.kidnapping: return AppTheme.dangerRed;
+      case WarningType.badRoad: return Colors.orange;
+      case WarningType.weather: return AppTheme.accentBlue;
+      case WarningType.traffic: return AppTheme.accentBlue;
+      case WarningType.accident: return Colors.deepOrange;
+    }
   }
 
   Widget _buildShortcutItem(IconData icon, String label) {
@@ -420,7 +665,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
             Text(
               value,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: valueColor,
               ),
@@ -429,9 +674,10 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 color: AppTheme.neonGreen.withOpacity(0.7),
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -481,8 +727,8 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                 Text(
                   subtitle,
                   style: TextStyle(
-                     color: AppTheme.neonGreen.withOpacity(0.7),
-                     fontSize: 14,
+                    color: AppTheme.neonGreen.withOpacity(0.7),
+                    fontSize: 14,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),

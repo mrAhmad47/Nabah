@@ -662,43 +662,70 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
   Widget _buildRouteCard(int index) {
     final route = _routes[index];
     final isSelected = index == _selectedRouteIndex;
-    
+    final isSafest = index == 0 && _routes.length > 1;
+
     return GestureDetector(
       onTap: () {
         setState(() {
           _selectedRouteIndex = index;
         });
       },
-      child: Container(
-        width: 280,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: isSelected ? 300 : 270,
         margin: const EdgeInsets.only(right: 12),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppTheme.backgroundDark.withOpacity(0.95),
+          color: AppTheme.backgroundDark.withOpacity(0.97),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? route.routeColor : Colors.grey.withOpacity(0.3),
             width: isSelected ? 2 : 1,
           ),
-          boxShadow: isSelected ? [
-            BoxShadow(color: route.routeColor.withOpacity(0.3), blurRadius: 10),
-          ] : null,
+          boxShadow: isSelected
+              ? [BoxShadow(color: route.routeColor.withOpacity(0.35), blurRadius: 14)]
+              : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Title row + score badge
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    route.routeName,
-                    style: TextStyle(
-                      color: isSelected ? route.routeColor : Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+                  child: Row(
+                    children: [
+                      if (isSafest)
+                        Container(
+                          margin: const EdgeInsets.only(right: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppTheme.neonGreen.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'SAFEST',
+                            style: TextStyle(
+                              color: AppTheme.neonGreen,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      Expanded(
+                        child: Text(
+                          route.routeName,
+                          style: TextStyle(
+                            color: isSelected ? route.routeColor : Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Container(
@@ -718,47 +745,91 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
                 ),
               ],
             ),
+
+            const SizedBox(height: 6),
+
+            // Safety score bar
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: route.safetyScore / 100,
+                backgroundColor: Colors.white12,
+                valueColor: AlwaysStoppedAnimation<Color>(route.routeColor),
+                minHeight: 5,
+              ),
+            ),
+
             const SizedBox(height: 8),
+
+            // Distance + duration
             Row(
               children: [
-                Icon(Icons.straighten, size: 14, color: Colors.grey[400]),
+                Icon(Icons.straighten, size: 13, color: Colors.grey[400]),
                 const SizedBox(width: 4),
                 Text(route.distanceText, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
-                const SizedBox(width: 16),
-                Icon(Icons.access_time, size: 14, color: Colors.grey[400]),
+                const SizedBox(width: 14),
+                Icon(Icons.access_time, size: 13, color: Colors.grey[400]),
                 const SizedBox(width: 4),
                 Text(route.durationText, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
               ],
             ),
-            const SizedBox(height: 8),
+
+            const SizedBox(height: 6),
+
+            // Safety level
             Row(
               children: [
                 Icon(
-                  route.safetyScore >= 60 ? Icons.verified_user : Icons.warning,
-                  size: 14,
+                  route.safetyScore >= 60 ? Icons.verified_user : Icons.warning_amber,
+                  size: 13,
                   color: route.routeColor,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   route.safetyLevel,
-                  style: TextStyle(color: route.routeColor, fontSize: 12, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: route.routeColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
+
+            // Warnings: show first if not selected, all if selected
             if (route.safetyWarnings.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(
-                route.safetyWarnings.first,
-                style: const TextStyle(color: Colors.orange, fontSize: 11),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              const SizedBox(height: 6),
+              if (!isSelected)
+                Text(
+                  route.safetyWarnings.first,
+                  style: const TextStyle(color: Colors.orange, fontSize: 11),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )
+              else
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 68),
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: route.safetyWarnings.length,
+                    itemBuilder: (context, i) => Padding(
+                      padding: const EdgeInsets.only(bottom: 3),
+                      child: Text(
+                        route.safetyWarnings[i],
+                        style: const TextStyle(color: Colors.orange, fontSize: 11),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ],
         ),
       ),
     );
   }
+
 
   Widget _buildInputField({
     required IconData icon,
