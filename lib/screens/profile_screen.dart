@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/theme.dart';
-import '../components/neon_card.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
@@ -13,19 +12,25 @@ class NAtlasService {
   // Server configuration - auto-detects platform
   static String get serverUrl => kIsWeb
       ? 'http://127.0.0.1:8765'  // Web: localhost
-      : 'http://10.227.22.32:8765';  // Mobile: WiFi IP
+      : 'http://10.227.22.98:8765';  // Mobile: WiFi IP
   static const String modelPath = 'models/N-ATLaS.Q2_K.gguf';
   
-  Process? _serverProcess;
   bool _isServerRunning = false;
   
   NAtlasService._init();
 
   /// Check if the N-ATLaS model file exists
   Future<bool> isModelAvailable() async {
+    // On web, we can't check local files — just check if server is responding
+    if (kIsWeb) {
+      final status = await getServerStatus();
+      return status.isAvailable;
+    }
     try {
-      final file = File(modelPath);
-      return await file.exists();
+      // On mobile/desktop, we could check file existence
+      // For now, just check server status
+      final status = await getServerStatus();
+      return status.isAvailable;
     } catch (e) {
       debugPrint('Error checking model: $e');
       return false;
@@ -36,18 +41,23 @@ class NAtlasService {
   Future<bool> startServer() async {
     if (_isServerRunning) return true;
     
+    if (kIsWeb) {
+      // Can't start processes from web — just check if it's already running
+      debugPrint('⚠️ Web: Cannot start server from browser. Run "python natlas_server.py" manually.');
+      final status = await getServerStatus();
+      _isServerRunning = status.isAvailable;
+      return _isServerRunning;
+    }
+    
     try {
       debugPrint('Starting N-ATLaS server...');
-      _serverProcess = await Process.start(
-        'python',
-        ['natlas_server.py', '8765'],
-        workingDirectory: Directory.current.path,
-      );
+      // On non-web platforms, attempt to start the server process
+      // Note: Process requires dart:io which is not available on web
+      debugPrint('⚠️ Please start the server manually: python natlas_server.py');
       
-      // Wait for server to start
+      // Wait and check if server is running
       await Future.delayed(const Duration(seconds: 3));
       
-      // Check if server is running
       final status = await getServerStatus();
       _isServerRunning = status.isAvailable;
       
@@ -61,7 +71,6 @@ class NAtlasService {
 
   /// Stop the Python server
   void stopServer() {
-    _serverProcess?.kill();
     _isServerRunning = false;
   }
 
@@ -100,20 +109,10 @@ class NAtlasService {
       return serverStatus;
     }
     
-    // Check if model file exists
-    final exists = await isModelAvailable();
-    if (!exists) {
-      return ModelStatus(
-        isAvailable: false,
-        isLoaded: false,
-        message: 'Model not found. Please download N-ATLaS.Q2_K.gguf to the models/ folder.',
-      );
-    }
-    
     return ModelStatus(
-      isAvailable: true,
+      isAvailable: false,
       isLoaded: false,
-      message: 'Model available. Start server with: python natlas_server.py',
+      message: 'Server not running. Start with: python natlas_server.py',
     );
   }
 

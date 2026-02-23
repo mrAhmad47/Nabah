@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart' as latlong2;
 import '../models/incident_report.dart';

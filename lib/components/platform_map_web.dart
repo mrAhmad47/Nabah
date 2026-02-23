@@ -17,6 +17,7 @@ Widget buildPlatformMap({
   List<latlong2.LatLng>? polylinePoints,
   Color polylineColor = const Color(0xFF39FF14),
   double polylineWidth = 4.0,
+  List<MapPolyline>? polylines,
   Function(latlong2.LatLng)? onTap,
   Function(latlong2.LatLng)? onCameraMove,
   VoidCallback? onCameraIdle,
@@ -32,6 +33,7 @@ Widget buildPlatformMap({
     polylinePoints: polylinePoints,
     polylineColor: polylineColor,
     polylineWidth: polylineWidth,
+    polylines: polylines,
     onMapCreated: onMapCreated,
     onStyleLoaded: onStyleLoaded,
     onTap: onTap,
@@ -50,6 +52,7 @@ class _GoogleMapWithPolyline extends StatefulWidget {
   final List<latlong2.LatLng>? polylinePoints;
   final Color polylineColor;
   final double polylineWidth;
+  final List<MapPolyline>? polylines;
   final Function(dynamic controller)? onMapCreated;
   final VoidCallback? onStyleLoaded;
   final Function(latlong2.LatLng)? onTap;
@@ -67,6 +70,7 @@ class _GoogleMapWithPolyline extends StatefulWidget {
     this.polylinePoints,
     this.polylineColor = const Color(0xFF39FF14),
     this.polylineWidth = 4.0,
+    this.polylines,
     this.onMapCreated,
     this.onStyleLoaded,
     this.onTap,
@@ -79,19 +83,14 @@ class _GoogleMapWithPolyline extends StatefulWidget {
 }
 
 class _GoogleMapWithPolylineState extends State<_GoogleMapWithPolyline> {
-  GoogleMapController? _controller;
 
   Set<Polyline> _buildPolylines() {
     final Set<Polyline> polylines = {};
     
+    // Main route polyline (backward compatibility)
     if (widget.polylinePoints != null && widget.polylinePoints!.isNotEmpty) {
-      // Debug log the first and last few points
       final points = widget.polylinePoints!;
-      debugPrint('📍 Building polyline with ${points.length} points');
-      if (points.isNotEmpty) {
-        debugPrint('   First point: ${points.first.latitude}, ${points.first.longitude}');
-        debugPrint('   Last point: ${points.last.latitude}, ${points.last.longitude}');
-      }
+      debugPrint('📍 Building main polyline with ${points.length} points');
       
       polylines.add(Polyline(
         polylineId: const PolylineId('route_line'),
@@ -103,6 +102,39 @@ class _GoogleMapWithPolylineState extends State<_GoogleMapWithPolyline> {
         endCap: Cap.roundCap,
         geodesic: true,
       ));
+    }
+    
+    // Additional polylines (for connectors, alternative routes, etc.)
+    if (widget.polylines != null) {
+      for (int i = 0; i < widget.polylines!.length; i++) {
+        final poly = widget.polylines![i];
+        
+        if (poly.isDashed) {
+          // Dashed line (for connectors) - approximated with dotted line
+          polylines.add(Polyline(
+            polylineId: PolylineId('dashed_$i'),
+            points: poly.points.map((p) => LatLng(p.latitude, p.longitude)).toList(),
+            color: poly.color,
+            width: poly.width.round().clamp(2, 6),
+            patterns: [PatternItem.dash(20), PatternItem.gap(10)], // Dashed pattern!
+            jointType: JointType.round,
+            startCap: Cap.roundCap,
+            endCap: Cap.roundCap,
+          ));
+        } else {
+          // Solid line
+          polylines.add(Polyline(
+            polylineId: PolylineId('solid_$i'),
+            points: poly.points.map((p) => LatLng(p.latitude, p.longitude)).toList(),
+            color: poly.color,
+            width: poly.width.round().clamp(3, 8),
+            jointType: JointType.round,
+            startCap: Cap.roundCap,
+            endCap: Cap.roundCap,
+            geodesic: true,
+          ));
+        }
+      }
     }
     
     return polylines;
@@ -192,7 +224,6 @@ class _GoogleMapWithPolylineState extends State<_GoogleMapWithPolyline> {
           : null,
       onCameraIdle: widget.onCameraIdle,
       onMapCreated: (controller) {
-        _controller = controller;
         widget.onMapCreated?.call(controller);
         widget.onStyleLoaded?.call();
       },

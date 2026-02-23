@@ -19,7 +19,13 @@ class AlertsScreen extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              Navigator.popUntil(context, (route) => route.isFirst);
+            }
+          },
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),

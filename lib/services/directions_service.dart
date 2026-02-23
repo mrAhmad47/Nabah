@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart' as latlong2;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import '../config/api_config.dart';
 
 /// Google Directions Service with Fallback
 /// 
@@ -87,7 +86,7 @@ class DirectionsService {
       // Auto-detect platform: localhost for web, WiFi IP for mobile
       final proxyUrl = kIsWeb 
           ? 'http://127.0.0.1:8765/directions'
-          : 'http://10.227.22.32:8765/directions';
+          : 'http://10.227.22.98:8765/directions';
       
       debugPrint('🗺️ Fetching directions via proxy: $originQuery -> $destQuery');
       final response = await http.post(
@@ -136,6 +135,14 @@ class DirectionsService {
             
             debugPrint('✅ Route ${routeIndex + 1}: ${allRoutePoints.length} total points from ${leg['steps'].length} steps');
             
+            // Simplify polyline for performance (reduce 8000+ points to optimal count)
+            final simplifiedPoints = _simplifyPolyline(
+              allRoutePoints,
+              leg['distance']['value'] / 1000, // distance in km
+            );
+            
+            debugPrint('✅ Route ${routeIndex + 1}: Simplified from ${allRoutePoints.length} to ${simplifiedPoints.length} points');
+            
             routes.add(RouteResult(
               routeIndex: routeIndex,
               routeName: _getRouteName(routeIndex, route['summary'] ?? ''),
@@ -145,7 +152,7 @@ class DirectionsService {
               distanceText: leg['distance']['text'],
               durationSeconds: leg['duration']['value'],
               durationText: leg['duration']['text'],
-              routePoints: allRoutePoints, // Now has 100-200+ points!
+              routePoints: simplifiedPoints, // Use simplified points!
               summary: route['summary'] ?? 'Route ${routeIndex + 1}',
               warnings: List<String>.from(route['warnings'] ?? []),
               steps: (leg['steps'] as List).map((step) {
@@ -322,6 +329,44 @@ class DirectionsService {
     return names[index.clamp(0, 3)];
   }
 
+  /// Simplify polyline to optimal point count based on route distance
+  /// Fixes performance issues with 8000+ point routes
+  List<latlong2.LatLng> _simplifyPolyline(List<latlong2.LatLng> points, double distanceKm) {
+    if (points.isEmpty) return points;
+    
+    // Determine optimal point count based on distance
+    int targetPoints;
+    if (distanceKm < 50) {
+      targetPoints = 400;   // Short routes: 400 points
+    } else if (distanceKm < 200) {
+      targetPoints = 600;   // Medium routes: 600 points
+    } else if (distanceKm < 500) {
+      targetPoints = 800;   // Long routes: 800 points
+    } else {
+      targetPoints = 1000;  // Very long routes: 1000 points
+    }
+    
+    // If already at or below target, no need to simplify
+    if (points.length <= targetPoints) {
+      return points;
+    }
+    
+    // Calculate step size to achieve target point count
+    final step = points.length ~/ targetPoints;
+    
+    // Sample points at regular intervals
+    final simplified = <latlong2.LatLng>[];
+    for (int i = 0; i < points.length; i += step) {
+      simplified.add(points[i]);
+    }
+    
+    // Always include the last point to ensure route ends correctly
+    if (simplified.last != points.last) {
+      simplified.add(points.last);
+    }
+    
+    return simplified;
+  }
 
   /// Remove HTML tags from instruction text
   String _stripHtml(String html) {

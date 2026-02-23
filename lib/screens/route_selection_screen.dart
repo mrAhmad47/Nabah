@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart' as latlong2;
+
+import '../components/platform_aware_map.dart';
 import '../theme/theme.dart';
 import '../components/neon_button.dart';
-import '../components/neon_card.dart';
-import '../components/platform_aware_map.dart';
 import '../services/incident_database.dart';
 import '../services/directions_service.dart';
 import '../services/natlas_service.dart';
 import '../services/route_safety_news_service.dart';
+import '../services/route_intersection_service.dart';
+import '../services/route_safety_cache.dart';
 import '../models/incident_report.dart';
 
 class RouteSelectionScreen extends StatefulWidget {
@@ -23,6 +25,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
   final IncidentDatabase _incidentDb = IncidentDatabase.instance;
   final DirectionsService _directionsService = DirectionsService.instance;
   final NAtlasService _natlasService = NAtlasService.instance;
+  final RouteIntersectionService _intersectionService = RouteIntersectionService.instance;
 
   // State
   List<RouteResult> _routes = [];
@@ -32,6 +35,10 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
   bool _routeCalculated = false;
   bool _isInputExpanded = true; // Toggle for input panel
   bool _isAnalyzingRoutes = false;
+  
+  // Intersection state
+  List<RouteIntersection> _intersections = [];
+  SwitchRecommendation? _switchRecommendation;
 
   // Map state
   latlong2.LatLng _mapCenter = latlong2.LatLng(9.0820, 8.6753); // Nigeria center
@@ -118,25 +125,37 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
     setState(() => _isAnalyzingRoutes = true);
 
     final newsService = RouteSafetyNewsService.instance;
+    final cache = RouteSafetyCache.instance;
     final fromText = _fromController.text.trim();
     final toText = _toController.text.trim();
 
     for (int i = 0; i < _routes.length; i++) {
       final route = _routes[i];
       
-      // 1. Find user-reported incidents along this route
+      // 1. Check cache first!
+      final cached = cache.get(fromText, toText);
+      if (cached != null) {
+        debugPrint('✅ Using CACHED safety data (${cached.ageDescription})');
+        
+        setState(() {
+          _routes[i].safetyScore = cached.safetyScore;
+          _routes[i].safetyLevel = cached.safetyLevel;
+          _routes[i].safetyWarnings = cached.warnings;
+          _routes[i].routeColor = _routes[i].getSafetyColor();
+        });
+        continue; // Skip API call!
+      }
+      
+      // 2. Find user-reported incidents along this route
       final incidents = await _findIncidentsAlongRoute(route);
       
-      // 2. AI News Search - analyze news for safety concerns
+      // 3. AI News Search - analyze news for locations
       debugPrint('🔍 AI analyzing news for route ${i + 1}...');
       final newsAnalysis = await newsService.analyzeRouteSafety(
-        routePoints: route.routePoints,
-        origin: fromText,
-        destination: toText,
-        routeIndex: i, // Pass route index for specific analysis
+        route: route,
       );
       
-      // 3. Combine all safety data
+      // 4. Combine all safety data
       int safetyScore = newsAnalysis.safetyScore;
       List<String> warnings = [];
 
@@ -177,6 +196,14 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
 
       debugPrint('✅ Route ${i + 1}: Safety Score $safetyScore ($safetyLevel)');
 
+      // 5. Store in cache for future requests
+      cache.set(fromText, toText, {
+        'safetyScore': safetyScore,
+        'safetyLevel': safetyLevel,
+        'warnings': warnings,
+      });
+      debugPrint('💾 Cached safety data for ${fromText} → ${toText}');
+
       setState(() {
         _routes[i].safetyScore = safetyScore;
         _routes[i].safetyLevel = safetyLevel;
@@ -192,6 +219,18 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
     // Get incidents for selected route
     if (_routes.isNotEmpty) {
       _routeIncidents = await _findIncidentsAlongRoute(_routes[_selectedRouteIndex]);
+    }
+    
+    // Detect route intersections for switching opportunities
+    debugPrint('🔀 Detecting route intersections...');
+    _intersections = _intersectionService.findIntersections(_routes);
+    debugPrint('✅ Found ${_intersections.length} route intersections');
+    
+    for (final intersection in _intersections) {
+      debugPrint('  📍 ${intersection.description}');
+      for (final point in intersection.intersectionPoints) {
+        debugPrint('    - ${point.getProgressDescription(intersection.route1.routeIndex)}');
+      }
     }
 
     setState(() => _isAnalyzingRoutes = false);
@@ -282,8 +321,124 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
         ),
       ));
     }
+    
+    
+    // Switch Point markers (route intersections)
+    for (final intersection in _intersections) {
+      // Only show intersections involving the currently selected route
+      if (intersection.route1.routeIndex != _selectedRouteIndex &&
+          intersection.route2.routeIndex != _selectedRouteIndex) {
+        continue;
+      }
+      
+      // Limit to max 3 intersection points to avoid clutter
+      final pointsToShow = intersection.intersectionPoints.length > 3
+          ? intersection.intersectionPoints.sublist(0, 3)
+          : intersection.intersectionPoints;
+      
+      for (final point in pointsToShow) {
+        markers.add(MapMarker(
+          position: point.location,
+          width: 50,
+          height: 50,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Pulsing outer ring
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.purple.withOpacity(0.2),
+                  border: Border.all(color: Colors.purple, width: 2),
+                ),
+              ),
+              // Inner icon
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: Colors.purple,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.purple.withOpacity(0.6),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.compare_arrows, color: Colors.white, size: 18),
+              ),
+            ],
+          ),
+        ));
+      }
+    }
 
     return markers;
+  }
+
+  /// Build dashed connector lines from intersection points to alternative routes
+  List<MapPolyline> _buildIntersectionConnectors() {
+    final connectors = <MapPolyline>[];
+    
+    if (_selectedRoute == null || _intersections.isEmpty) {
+      return connectors;
+    }
+    
+    for (final intersection in _intersections) {
+      // Only show connectors for selected route
+      if (intersection.route1.routeIndex != _selectedRouteIndex &&
+          intersection.route2.routeIndex != _selectedRouteIndex) {
+        continue;
+      }
+      
+      // Limit to 3 connectors to avoid clutter
+      final pointsToShow = intersection.intersectionPoints.length > 3
+          ? intersection.intersectionPoints.sublist(0, 3)
+          : intersection.intersectionPoints;
+      
+      for (final point in pointsToShow) {
+        // Determine which is the alternative route
+        final altRoute = intersection.route1.routeIndex == _selectedRouteIndex
+            ? intersection.route2
+            : intersection.route1;
+        
+        // Find closest point on alternative route
+        final closestPoint = _findClosestPoint(point.location, altRoute.routePoints);
+        
+        // Create dashed connector line
+        connectors.add(MapPolyline(
+          points: [point.location, closestPoint],
+          color: Colors.purple.withOpacity(0.7),
+          width: 3.0,
+          isDashed: true,
+        ));
+      }
+    }
+    
+    return connectors;
+  }
+
+  /// Find closest point in a list to a target point
+  latlong2.LatLng _findClosestPoint(latlong2.LatLng target, List<latlong2.LatLng> points) {
+    if (points.isEmpty) return target;
+    
+    latlong2.LatLng closest = points.first;
+    double minDistance = _calculatePointDistance(target, closest);
+    
+    for (final point in points) {
+      final distance = _calculatePointDistance(target, point);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closest = point;
+      }
+    }
+    
+    return closest;
   }
 
   @override
@@ -303,6 +458,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
               polylinePoints: _selectedRoute?.routePoints,
               polylineColor: _selectedRoute?.routeColor ?? AppTheme.neonGreen,
               polylineWidth: 5.0,
+              polylines: _buildIntersectionConnectors(), // Add dashed connectors
             ),
           ),
           
@@ -346,6 +502,15 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
               child: _buildInputPanel(),
             ),
           ),
+          
+          // Switch Recommendation Banner
+          if (_intersections.isNotEmpty && _selectedRoute != null)
+            Positioned(
+              top: _isInputExpanded ? 320 : 120,
+              left: 16,
+              right: 16,
+              child: _buildSwitchRecommendationBanner(),
+            ),
 
           // Route Selection Cards (bottom)
           if (_routeCalculated && _routes.isNotEmpty)
@@ -624,6 +789,117 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
           ),
         ),
       ],
+    );
+  }
+  
+  Widget _buildSwitchRecommendationBanner() {
+    // Find intersections involving current route
+    final relevantIntersections = _intersections.where((intersection) {
+      return intersection.route1.routeIndex == _selectedRouteIndex ||
+             intersection.route2.routeIndex == _selectedRouteIndex;
+    }).toList();
+    
+    if (relevantIntersections.isEmpty) return const SizedBox.shrink();
+    
+    // Get the alternative route from first intersection
+    final firstIntersection = relevantIntersections.first;
+    final alternativeRoute = firstIntersection.route1.routeIndex == _selectedRouteIndex
+        ? firstIntersection.route2
+        : firstIntersection.route1;
+    
+    final safetyDiff = alternativeRoute.safetyScore - (_selectedRoute?.safetyScore ?? 0);
+    
+    // Only show if alternative is safer
+    if (safetyDiff <= 0) return const SizedBox.shrink();
+    
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.purple.withOpacity(0.9),
+            Colors.deepPurple.withOpacity(0.9),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.purpleAccent, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.purple.withOpacity(0.4),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.compare_arrows, color: Colors.white, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Switch Point Available',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${relevantIntersections.length} intersection${relevantIntersections.length > 1 ? 's' : ''} with ${alternativeRoute.routeName}',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 12,
+                  ),
+                ),
+                if (safetyDiff > 0)
+                  Text(
+                    '+${safetyDiff}% safer',
+                    style: const TextStyle(
+                      color: AppTheme.neonGreen,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _selectedRouteIndex = alternativeRoute.routeIndex;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Switched to ${alternativeRoute.routeName}'),
+                  backgroundColor: Colors.purple,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.neonGreen,
+              foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              'SWITCH',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

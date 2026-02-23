@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart' as latlong2;
@@ -24,6 +23,7 @@ class PlatformAwareMap extends StatelessWidget {
   final List<latlong2.LatLng>? polylinePoints;
   final Color polylineColor;
   final double polylineWidth;
+  final List<MapPolyline>? polylines; // New: Support multiple polylines
   final Function(latlong2.LatLng)? onTap;
   final Function(latlong2.LatLng)? onCameraMove;
   final VoidCallback? onCameraIdle;
@@ -42,6 +42,7 @@ class PlatformAwareMap extends StatelessWidget {
     this.polylinePoints,
     this.polylineColor = const Color(0xFF39FF14),
     this.polylineWidth = 4.0,
+    this.polylines,
     this.onTap,
     this.onCameraMove,
     this.onCameraIdle,
@@ -62,11 +63,27 @@ class PlatformAwareMap extends StatelessWidget {
       polylinePoints: polylinePoints,
       polylineColor: polylineColor,
       polylineWidth: polylineWidth,
+      polylines: polylines,
       onTap: onTap,
       onCameraMove: onCameraMove,
       onCameraIdle: onCameraIdle,
     );
   }
+}
+
+/// Polyline data for routes and connectors
+class MapPolyline {
+  final List<latlong2.LatLng> points;
+  final Color color;
+  final double width;
+  final bool isDashed;
+  
+  const MapPolyline({
+    required this.points,
+    required this.color,
+    this.width = 4.0,
+    this.isDashed = false,
+  });
 }
 
 /// Circle data for heatmap visualization

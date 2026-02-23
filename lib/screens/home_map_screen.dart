@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/theme.dart';
-import '../components/app_bar.dart';
 import '../components/neon_button.dart';
 import '../components/neon_card.dart';
 import 'route_selection_screen.dart';

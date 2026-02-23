@@ -3,14 +3,16 @@ import '../theme/theme.dart';
 
 class NeonButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed; // Make nullable to support disabled state
   final bool isPrimary;
+  final bool isLoading;
 
   const NeonButton({
     Key? key,
     required this.text,
     required this.onPressed,
     this.isPrimary = true,
+    this.isLoading = false,
   }) : super(key: key);
 
   @override
@@ -18,7 +20,7 @@ class NeonButton extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        boxShadow: isPrimary
+        boxShadow: isPrimary && !isLoading && onPressed != null
             ? [
                 BoxShadow(
                   color: AppTheme.neonGreen.withOpacity(0.4),
@@ -32,6 +34,7 @@ class NeonButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: isPrimary ? AppTheme.neonGreen : Colors.transparent,
           foregroundColor: isPrimary ? Colors.black : AppTheme.neonGreen,
+          disabledBackgroundColor: isPrimary ? AppTheme.neonGreen.withOpacity(0.5) : Colors.transparent,
           side: isPrimary ? BorderSide.none : const BorderSide(color: AppTheme.neonGreen, width: 1.5),
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           shape: RoundedRectangleBorder(
@@ -42,8 +45,19 @@ class NeonButton extends StatelessWidget {
             fontSize: 16,
           ),
         ),
-        onPressed: onPressed,
-        child: Text(text),
+        onPressed: isLoading ? null : onPressed,
+        child: isLoading
+            ? SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isPrimary ? Colors.black : AppTheme.neonGreen,
+                  ),
+                ),
+              )
+            : Text(text),
       ),
     );
   }

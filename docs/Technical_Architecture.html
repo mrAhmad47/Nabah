@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>RouteGuardian - Technical Architecture</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2940 100%);
+            color: #e0e0e0;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #00ff88;
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .architecture {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .tier {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .tier-title {
+            color: #00ff88;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tier-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00ff88;
+        }
+
+        .components {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .component {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 12px;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .component-name {
+            color: #00ff88;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .arrow {
+            text-align: center;
+            color: #00ff88;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        .external {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .external-box {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            flex: 1;
+        }
+
+        .external-box .component-name {
+            color: #ffa500;
+        }
+
+        .section-title {
+            color: #00ff88;
+            font-size: 18px;
+            margin: 30px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .text-content {
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .list {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .list li {
+            margin-bottom: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🛡️ RouteGuardian</h1>
+        <p class="subtitle">AI-Powered Safe Route Navigation for Nigeria | Awarri Developer Challenge 2025</p>
+
+        <div class="architecture">
+            <!-- Tier 1: Flutter App -->
+            <div class="tier">
+                <div class="tier-title">TIER 1: Flutter Mobile Application</div>
+                <div class="components">
+                    <div class="component">
+                        <div class="component-name">🏠 Home Screen</div>
+                        Origin/destination input with GPS
+                    </div>
+                    <div class="component">
+                        <div class="component-name">🛣️ Route Selection</div>
+                        3 route alternatives with safety scores
+                    </div>
+                    <div class="component">
+                        <div class="component-name">🗺️ Explore Map</div>
+                        Incident heatmap visualization
+                    </div>
+                    <div class="component">
+                        <div class="component-name">⚠️ Report Incident</div>
+                        Community safety reports
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow">▼</div>
+
+            <!-- Tier 2: N-ATLaS Server -->
+            <div class="tier">
+                <div class="tier-title">TIER 2: N-ATLaS Python Server (Port 8765)</div>
+                <div class="components">
+                    <div class="component">
+                        <div class="component-name">/directions</div>
+                        Google Directions API proxy for CORS bypass
+                    </div>
+                    <div class="component">
+                        <div class="component-name">/search_news</div>
+                        Triple Fallback: NewsAPI → Scraping → Demo
+                    </div>
+                    <div class="component">
+                        <div class="component-name">/analyze</div>
+                        AI text analysis for incident detection
+                    </div>
+                    <div class="component">
+                        <div class="component-name">/severity</div>
+                        Incident severity scoring (0-100)
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow">▼</div>
+
+            <!-- Tier 3: AI Model -->
+            <div class="tier">
+                <div class="tier-title">TIER 3: N-ATLaS AI Model</div>
+                <div class="components">
+                    <div class="component">
+                        <div class="component-name">🧠 Llama 3.2 3B</div>
+                        N-ATLaS.Q2_K.gguf (3GB quantized)
+                    </div>
+                    <div class="component">
+                        <div class="component-name">⚡ llama-cpp-python</div>
+                        High-performance local inference
+                    </div>
+                    <div class="component">
+                        <div class="component-name">🔒 Privacy-First</div>
+                        On-device processing, no cloud
+                    </div>
+                </div>
+            </div>
+
+            <!-- External Services -->
+            <div class="external">
+                <div class="external-box">
+                    <div class="component-name">🌐 Google Maps API</div>
+                    Directions, Geocoding, Maps SDK
+                </div>
+                <div class="external-box">
+                    <div class="component-name">📰 NewsAPI.org</div>
+                    Real-time Nigeria news feed
+                </div>
+                <div class="external-box">
+                    <div class="component-name">💾 SQLite</div>
+                    Local incident database
+                </div>
+                <center><span class="badge">Powered by N-ATLaS</span></center>
+            </div>
+
+            <h2 class="section-title">System Overview</h2>
+            <div class="text-content">
+                <p>RouteGuardian is a comprehensive travel safety application designed specifically for Nigeria's unique
+                    transportation challenges. The application addresses a critical need in a country where travelers
+                    face varied security conditions across different regions, from urban congestion in Lagos to security
+                    advisories in northern states. By combining modern mobile technology with artificial intelligence,
+                    RouteGuardian empowers users to make informed decisions about their travel routes.</p>
+
+                <p style="margin-top: 15px;">The system follows a three-tier architecture that separates concerns
+                    between the user interface, AI processing layer, and external data sources. This design ensures
+                    scalability, maintainability, and the ability to operate both online and offline. The Flutter-based
+                    frontend provides cross-platform compatibility, while the Python-based N-ATLaS server handles all AI
+                    inference and data aggregation tasks.</p>
+            </div>
+
+            <h2 class="section-title">How N-ATLaS is Leveraged</h2>
+            <div class="text-content">
+                <p>RouteGuardian integrates <strong>N-ATLaS (Llama 3.2 3B)</strong>, Nigeria's first national
+                    open-source multilingual AI model developed in partnership with FMOCIDe, NCAIR, and NITDA. The model
+                    serves as the core intelligence engine, providing context-aware safety analysis that understands
+                    Nigerian locations, security terminology, and local nuances that generic AI models would miss.</p>
+
+                <p style="margin-top: 15px;"><strong>AI-Powered Safety Scoring:</strong> When a user requests route
+                    alternatives, the system collects news articles and incident reports for locations along each route.
+                    N-ATLaS processes these texts to identify safety-relevant information, classifying incidents by type
+                    (robbery, kidnapping, accident, traffic congestion) and assessing their severity on a 0-100 scale.
+                    The model uses natural language understanding to parse headlines like "Security forces deploy on
+                    Kaduna-Zaria highway" and determine whether this indicates increased safety (more patrols) or
+                    heightened risk (active threat response).</p>
+
+                <p style="margin-top: 15px;"><strong>Intelligent Text Classification:</strong> The N-ATLaS model
+                    performs multi-label classification on news content, identifying incident categories and extracting
+                    location mentions. This enables the system to map incidents to specific route segments rather than
+                    entire cities, providing granular safety assessments. For example, the model can distinguish between
+                    an incident on the Lagos-Ibadan expressway versus one within Lagos city, affecting different routes
+                    differently.</p>
+
+                <p style="margin-top: 15px;"><strong>Local Inference Architecture:</strong> Unlike cloud-based AI
+                    solutions, RouteGuardian runs N-ATLaS locally using the llama-cpp-python library. The quantized GGUF
+                    model (3GB) is optimized for efficient inference on consumer hardware, enabling real-time analysis
+                    without internet dependency. This architecture choice ensures user privacy—travel patterns and
+                    location data never leave the device—and provides resilience in areas with poor connectivity, common
+                    in many Nigerian regions.</p>
+            </div>
+
+            <h2 class="section-title">Data Flow & Processing Pipeline</h2>
+            <div class="text-content">
+                <p>The application implements a sophisticated data pipeline that combines multiple information sources
+                    to generate comprehensive safety assessments:</p>
+
+                <p style="margin-top: 15px;"><strong>1. Route Request:</strong> The Flutter app sends origin and
+                    destination coordinates to the N-ATLaS server, which proxies the request to Google Directions API.
+                    The server retrieves up to three alternative routes with full polyline data containing 200+
+                    waypoints for accurate road-following visualization.</p>
+
+                <p style="margin-top: 15px;"><strong>2. Location Extraction:</strong> For each route, the system
+                    identifies key locations along the path—cities, highways, and regions that the route traverses.
+                    These locations become the search targets for news and incident data.</p>
+
+                <p style="margin-top: 15px;"><strong>3. News Aggregation (Triple Fallback):</strong> The server
+                    implements a robust triple-fallback strategy for news retrieval. First, it attempts NewsAPI.org for
+                    high-quality, structured articles. If unavailable, it falls back to Google News web scraping.
+                    Finally, if both fail, a curated demo database provides baseline safety information for major
+                    Nigerian routes. This ensures the system always provides some level of intelligence, even offline.
+                </p>
+
+                <p style="margin-top: 15px;"><strong>4. AI Analysis:</strong> Collected news items are fed to the
+                    N-ATLaS model for safety analysis. The model evaluates each headline for threat indicators, assigns
+                    severity scores, and generates human-readable warnings. Results are aggregated per-route to produce
+                    a final safety score (0-100) and prioritized list of concerns.</p>
+
+                <p style="margin-top: 15px;"><strong>5. User Presentation:</strong> The Flutter app displays route
+                    alternatives on an interactive map, with each route color-coded by safety level (green = safe,
+                    yellow = moderate, red = avoid). Users can tap routes to see detailed AI-generated warnings and make
+                    informed travel decisions.</p>
+            </div>
+
+            <h2 class="section-title">Key Features</h2>
+            <div class="text-content">
+                <ul class="list">
+                    <li><strong>Multi-Route Alternatives:</strong> Provides up to 3 route options with comparative
+                        safety scores, allowing users to balance travel time against security concerns</li>
+                    <li><strong>Real-Time Incident Detection:</strong> Automatically discovers and analyzes news from
+                        Nigerian sources within the last 24 hours</li>
+                    <li><strong>Community Reporting:</strong> Users can submit incident reports with location, type, and
+                        description, contributing to collective safety awareness</li>
+                    <li><strong>Interactive Heatmap:</strong> Visualizes incident density using 500m radius circles with
+                        severity-based coloring</li>
+                    <li><strong>Cross-Platform Deployment:</strong> Single codebase runs on Web (Chrome), Android, iOS,
+                        Windows, macOS, and Linux</li>
+                    <li><strong>Offline Capability:</strong> Core functionality works without internet using cached data
+                        and demo fallbacks</li>
+                </ul>
+            </div>
+
+            <h2 class="section-title">Technical Stack</h2>
+            <div class="text-content">
+                <p><strong>Frontend:</strong> Flutter 3.0+ with Dart, Google Maps SDK, flutter_polyline_points for route
+                    rendering, Provider for state management, SQLite for local incident storage.</p>
+
+                <p style="margin-top: 10px;"><strong>Backend:</strong> Python 3.8+ HTTP server, llama-cpp-python for
+                    N-ATLaS inference, urllib for API requests, dotenv for secure configuration management.</p>
+
+                <p style="margin-top: 10px;"><strong>AI Model:</strong> N-ATLaS Llama 3.2 3B (Q2_K quantization, 3GB),
+                    optimized for 4-thread CPU inference with 2048 token context window.</p>
+
+                <p style="margin-top: 10px;"><strong>External APIs:</strong> Google Directions API, Google Maps SDK,
+                    NewsAPI.org, Google News (scraping fallback).</p>
+            </div>
+
+            <div class="footer">
+                <p>Developer: Auwal Ahmad | GitHub: github.com/mrAhmad47/route-guardian</p>
+                <p>Built for Awarri Developer Challenge 2025 | Powered by N-ATLaS, FMOCIDe, NCAIR & NITDA</p>
+            </div>
+</body>
+
+</html>

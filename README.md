@@ -18,6 +18,8 @@ A Flutter application that helps users find the safest routes by analyzing real-
 
 ## 🎯 Key Highlights
 
+- **Local-First Architecture**: No backend required - runs completely locally
+- **No Firebase Dependency**: Authentication is mocked for local development
 - **200+ Point Route Polylines**: Routes follow roads accurately with smooth curves
 - **24-Hour Incident Filter**: Only shows recent, relevant safety information
 - **Offline Routing**: Fallback routing when server unavailable
@@ -139,7 +141,7 @@ flutter run -d chrome
 - [ ] Real-time location tracking during navigation
 - [ ] Push notifications for route hazards
 - [ ] Incident photo uploads
-- [ ] Firebase integration for cloud sync
+- [ ] Backend API integration for user authentication and data sync
 - [ ] Voice navigation with safety alerts
 
 ## 📝 License

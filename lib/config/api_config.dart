@@ -4,11 +4,7 @@
 /// NOTE: In production, use environment variables or secure storage.
 class ApiConfig {
   // Google Maps API Key
-  // For production, use --dart-define or environment variables
-  static const String googleMapsApiKey = String.fromEnvironment(
-    'GOOGLE_MAPS_API_KEY',
-    defaultValue: 'YOUR_GOOGLE_MAPS_API_KEY_HERE',
-  );
+  static const String googleMapsApiKey = 'AIzaSyDLgxgrNJq-4xjRi_cc9RPvX-kKC06VwyQ';
   
   // N-ATLaS Server
   static const String natlasServerUrl = 'http://localhost:8765';

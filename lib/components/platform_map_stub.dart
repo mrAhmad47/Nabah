@@ -16,6 +16,11 @@ Widget buildPlatformMap({
   List<latlong2.LatLng>? polylinePoints,
   Color polylineColor = const Color(0xFF39FF14),
   double polylineWidth = 4.0,
+  List<MapPolyline>? polylines,
+  Function(latlong2.LatLng)? onTap,
+  Function(latlong2.LatLng)? onCameraMove,
+  VoidCallback? onCameraIdle,
 }) {
   throw UnsupportedError('Platform not supported');
 }
+

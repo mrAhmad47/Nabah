@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart' as latlong2;
 import '../theme/theme.dart';
 import '../components/neon_card.dart';
-import '../components/neon_button.dart';
 import '../services/natlas_service.dart';
 import 'incident_map_screen.dart';
 
@@ -77,7 +76,13 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
             centerTitle: true,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                }
+              },
             ),
             actions: [
               IconButton(

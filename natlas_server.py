@@ -37,7 +37,7 @@ try:
 except ImportError:
     pass  # dotenv not installed, will use os.getenv
 
-NEWS_API_KEY = os.getenv('NEWS_API_KEY', 'YOUR_NEWSAPI_KEY_HERE')
+NEWS_API_KEY = os.getenv('NEWS_API_KEY', 'YOUR_API_KEY_HERE')
 GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY', 'YOUR_GOOGLE_MAPS_API_KEY_HERE')
 # ============================
 
@@ -69,7 +69,7 @@ def load_model():
 # ==========================================
 def search_newsapi(query, location="Nigeria"):
     """Search using NewsAPI.org - reliable, full articles"""
-    if NEWS_API_KEY == "YOUR_API_KEY_HERE":
+    if not NEWS_API_KEY or NEWS_API_KEY == "YOUR_API_KEY_HERE":
         print("⚠️ NewsAPI key not configured, skipping...")
         return None
     
@@ -490,7 +490,7 @@ def main():
     if not load_model():
         print("WARNING: Running without AI model")
     
-    if NEWS_API_KEY == "YOUR_API_KEY_HERE":
+    if not NEWS_API_KEY or NEWS_API_KEY == "YOUR_API_KEY_HERE":
         print("⚠️  NewsAPI key not set - will use scraping/demo")
         print("   Get free key at: https://newsapi.org/register")
     else:

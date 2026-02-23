@@ -18,6 +18,9 @@ Widget buildPlatformMap({
   List<latlong2.LatLng>? polylinePoints,
   Color polylineColor = const Color(0xFF39FF14),
   double polylineWidth = 4.0,
+  Function(latlong2.LatLng)? onTap,
+  Function(latlong2.LatLng)? onCameraMove,
+  VoidCallback? onCameraIdle,
 }) {
   // For desktop platforms (Windows, macOS, Linux), use flutter_map as fallback
   // Google Maps Flutter doesn't support desktop yet
@@ -34,6 +37,9 @@ Widget buildPlatformMap({
       polylineWidth: polylineWidth,
       onMapCreated: onMapCreated,
       onStyleLoaded: onStyleLoaded,
+      onTap: onTap,
+      onCameraMove: onCameraMove,
+      onCameraIdle: onCameraIdle,
     );
   }
 
@@ -50,6 +56,9 @@ Widget buildPlatformMap({
     polylineWidth: polylineWidth,
     onMapCreated: onMapCreated,
     onStyleLoaded: onStyleLoaded,
+    onTap: onTap,
+    onCameraMove: onCameraMove,
+    onCameraIdle: onCameraIdle,
   );
 }
 
@@ -65,6 +74,9 @@ Widget _buildGoogleMap({
   double polylineWidth = 4.0,
   Function(dynamic controller)? onMapCreated,
   VoidCallback? onStyleLoaded,
+  Function(latlong2.LatLng)? onTap,
+  Function(latlong2.LatLng)? onCameraMove,
+  VoidCallback? onCameraIdle,
 }) {
   // Build polylines
   final Set<Polyline> polylines = {};
@@ -130,6 +142,20 @@ Widget _buildGoogleMap({
     tiltGesturesEnabled: false,
     compassEnabled: false,
     mapToolbarEnabled: false,
+    onTap: onTap != null
+        ? (LatLng position) {
+            onTap(latlong2.LatLng(position.latitude, position.longitude));
+          }
+        : null,
+    onCameraMove: onCameraMove != null
+        ? (CameraPosition position) {
+            onCameraMove(latlong2.LatLng(
+              position.target.latitude,
+              position.target.longitude,
+            ));
+          }
+        : null,
+    onCameraIdle: onCameraIdle,
     onMapCreated: (controller) {
       onMapCreated?.call(controller);
       onStyleLoaded?.call();
@@ -150,6 +176,9 @@ Widget _buildFlutterMapFallback({
   double polylineWidth = 4.0,
   Function(dynamic controller)? onMapCreated,
   VoidCallback? onStyleLoaded,
+  Function(latlong2.LatLng)? onTap,
+  Function(latlong2.LatLng)? onCameraMove,
+  VoidCallback? onCameraIdle,
 }) {
   // Import flutter_map dynamically
   return FutureBuilder(

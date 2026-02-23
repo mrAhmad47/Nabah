@@ -1,3 +1,11 @@
+buildscript {
+    ext {
+        compileSdkVersion = 35
+        targetSdkVersion = 35
+        minSdkVersion = 21
+    }
+}
+
 allprojects {
     repositories {
         google()
@@ -12,6 +20,7 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(":app")
 }
+
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir

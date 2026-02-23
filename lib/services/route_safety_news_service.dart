@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:latlong2/latlong.dart' as latlong2;
+import 'reverse_geocoding_service.dart';
+import 'directions_service.dart';
 
 /// Route Safety News Service
 /// 
@@ -16,36 +16,37 @@ class RouteSafetyNewsService {
   // Auto-detect platform: localhost for web, WiFi IP for mobile
   static String get _serverUrl => kIsWeb
       ? 'http://127.0.0.1:8765'
-      : 'http://10.227.22.32:8765';
+      : 'http://10.227.22.98:8765';
+  
+  final _geocodingService = ReverseGeocodingService.instance;
   
   RouteSafetyNewsService._init();
 
-  double _getRecencyMultiplier(DateTime newsDate) {
-    final age = DateTime.now().difference(newsDate);
-    if (age.inHours < 24) return 1.0;
-    if (age.inDays < 7) return 0.8;
-    if (age.inDays < 30) return 0.5;
-    if (age.inDays < 90) return 0.25;
-    return 0.1;
-  }
-
-  String _getRecencyLabel(DateTime newsDate) {
-    final age = DateTime.now().difference(newsDate);
-    if (age.inHours < 24) return '${age.inHours}h ago';
-    if (age.inDays < 7) return '${age.inDays}d ago';
-    if (age.inDays < 30) return '${(age.inDays / 7).floor()}w ago';
-    return '${(age.inDays / 30).floor()}mo ago';
-  }
-
-  /// Main analysis - uses N-ATLaS server for real news search
+  /// Main analysis - Extracts up to 5 intermediate towns for comprehensive coverage
   Future<RouteSafetyAnalysis> analyzeRouteSafety({
-    required List<latlong2.LatLng> routePoints,
-    required String origin,
-    required String destination,
-    int routeIndex = 0,
+    required RouteResult route,
   }) async {
-    final locations = _getLocationsFromRoute(origin, destination, routeIndex);
-    debugPrint('🔍 Asking N-ATLaS to search news for: ${locations.join(" → ")}');
+    // Extract intermediate towns (limited to 5 to prevent slow performance)
+    List<String> locations;
+    
+    try {
+      final extractedTowns = await _geocodingService.extractTownsFromRoute(
+        routePoints: route.routePoints,
+        origin: route.originAddress,
+        destination: route.destinationAddress,
+        maxTowns: 5, // Limit to 5 intermediate locations
+      );
+      
+      locations = extractedTowns.map((town) => _cleanCityName(town)).toList();
+      debugPrint('🔍 Analyzing safety for ${locations.length} locations: ${locations.join(" → ")}');
+    } catch (e) {
+      // Fallback to origin/destination if geocoding fails
+      debugPrint('⚠️ Geocoding failed: $e - using origin/destination only');
+      locations = [
+        _cleanCityName(route.originAddress),
+        _cleanCityName(route.destinationAddress),
+      ];
+    }
     
     // Try N-ATLaS server for real news search
     try {
@@ -53,7 +54,7 @@ class RouteSafetyNewsService {
         Uri.parse('$_serverUrl/search_news'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'locations': locations}),
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 20)); // Increased to allow NewsAPI + AI analysis time
       
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -85,7 +86,7 @@ class RouteSafetyNewsService {
         
         // Adjust for route index
         int adjustedScore = safetyScore;
-        if (routeIndex == 2 && warnings.isEmpty) {
+        if (route.routeIndex == 2 && warnings.isEmpty) {
           adjustedScore += 3;
         }
         adjustedScore = adjustedScore.clamp(10, 95);
@@ -99,12 +100,16 @@ class RouteSafetyNewsService {
         );
       }
     } catch (e) {
-      debugPrint('⚠️ N-ATLaS server not available: $e');
-      debugPrint('   Using fallback analysis...');
+      debugPrint('⚠️ N-ATLaS server error: $e');
+      if (e.toString().contains('TimeoutException')) {
+        debugPrint('   Timeout after 5 seconds - using fallback analysis...');
+      } else {
+        debugPrint('   Network error - using fallback analysis...');
+      }
     }
     
     // Fallback if server unavailable
-    return _getFallbackAnalysis(locations, routeIndex);
+    return _getFallbackAnalysis(locations, route.routeIndex);
   }
 
   WarningType _getWarningType(String dangerType) {
@@ -178,37 +183,23 @@ class RouteSafetyNewsService {
     );
   }
 
-  List<String> _getLocationsFromRoute(String origin, String destination, int routeIndex) {
-    final locations = <String>[origin];
-    final lo = origin.toLowerCase();
-    final ld = destination.toLowerCase();
-    
-    if (lo.contains('lagos') && ld.contains('abuja')) {
-      locations.addAll(['Ibadan', 'Ilorin', 'Lokoja']);
-    }
-    if (lo.contains('bauchi') && ld.contains('kaduna')) {
-      locations.addAll(['Jos', 'Kaduna']);
-    }
-    if (lo.contains('bauchi') && ld.contains('kano')) {
-      locations.add('Kano');
-    }
-    if (lo.contains('zamfara') || ld.contains('zamfara')) {
-      locations.add('Zamfara');
-    }
-    
-    if (!locations.contains(destination)) {
-      locations.add(destination);
-    }
-    
-    return locations.toSet().toList();
-  }
-
   String _getSafetyLevel(int score) {
     if (score >= 85) return 'VERY SAFE';
     if (score >= 70) return 'MOSTLY SAFE';
     if (score >= 50) return 'MODERATE RISK';
     if (score >= 30) return 'HIGH RISK';
     return 'DANGER ZONE';
+  }
+
+  String _cleanCityName(String address) {
+    // Extract city name from full address
+    // e.g., "Bauchi, Nigeria" -> "Bauchi"
+    return address
+        .split(',')
+        .first
+        .replaceAll(' State', '')
+        .replaceAll(' LGA', '')
+        .trim();
   }
 }
 

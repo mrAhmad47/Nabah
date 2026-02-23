@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -40,7 +40,7 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   
   // Evidence
-  final List<File> _mediaFiles = [];
+  final List<XFile> _mediaFiles = [];
   final List<String> _linkUrls = [];
   final TextEditingController _linkController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
@@ -132,21 +132,21 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
   Future<void> _pickImage() async {
     final XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      setState(() => _mediaFiles.add(File(image.path)));
+      setState(() => _mediaFiles.add(image));
     }
   }
 
   Future<void> _takePhoto() async {
     final XFile? photo = await _imagePicker.pickImage(source: ImageSource.camera);
     if (photo != null) {
-      setState(() => _mediaFiles.add(File(photo.path)));
+      setState(() => _mediaFiles.add(photo));
     }
   }
 
   Future<void> _pickVideo() async {
     final XFile? video = await _imagePicker.pickVideo(source: ImageSource.gallery);
     if (video != null) {
-      setState(() => _mediaFiles.add(File(video.path)));
+      setState(() => _mediaFiles.add(video));
     }
   }
 
@@ -217,7 +217,13 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      if (Navigator.canPop(context)) {
+                        Navigator.pop(context);
+                      } else {
+                        Navigator.popUntil(context, (route) => route.isFirst);
+                      }
+                    },
                   ),
                   const Text(
                     'Report Incident',
@@ -482,17 +488,27 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
                     padding: const EdgeInsets.only(right: 8),
                     child: Stack(
                       children: [
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppTheme.neonGreen),
-                            image: DecorationImage(
-                              image: FileImage(_mediaFiles[index]),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                        FutureBuilder<Uint8List>(
+                          future: _mediaFiles[index].readAsBytes(),
+                          builder: (context, snapshot) {
+                            return Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppTheme.neonGreen),
+                                image: snapshot.hasData
+                                    ? DecorationImage(
+                                        image: MemoryImage(snapshot.data!),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : null,
+                              ),
+                              child: !snapshot.hasData
+                                  ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
+                                  : null,
+                            );
+                          },
                         ),
                         Positioned(
                           top: 4,
@@ -750,18 +766,9 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Close dialog only
-                  // Clear form
-                  _descriptionController.clear();
-                  setState(() {
-                    _selectedLocation = null;
-                    _locationText = 'Pin on map or use current location';
-                    selectedIncidentType = 'Robbery';
-                    _selectedDate = DateTime.now();
-                    _selectedTime = TimeOfDay.now();
-                    _mediaFiles.clear();
-                    _linkUrls.clear();
-                  });
+                  Navigator.of(dialogContext).pop(); // Close dialog using dialogContext
+                  // Navigate to home screen
+                  Navigator.of(context).popUntil((route) => route.isFirst);
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: AppTheme.neonGreen,
