@@ -84,7 +84,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             height: 80,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppTheme.accentBlue.withOpacity(0.1),
+              color: AppTheme.accentBlue.withValues(alpha: 0.1),
               border: Border.all(color: AppTheme.accentBlue, width: 2),
             ),
             child: const Icon(
@@ -129,7 +129,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               labelStyle: TextStyle(color: Colors.grey[400]),
               prefixIcon: const Icon(Icons.email_outlined, color: AppTheme.accentBlue),
               filled: true,
-              fillColor: Colors.white.withOpacity(0.05),
+              fillColor: Colors.white.withValues(alpha: 0.05),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(color: Colors.white10),
@@ -179,7 +179,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           height: 100,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppTheme.neonGreen.withOpacity(0.1),
+            color: AppTheme.neonGreen.withValues(alpha: 0.1),
             border: Border.all(color: AppTheme.neonGreen, width: 3),
           ),
           child: const Icon(
@@ -230,9 +230,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppTheme.accentBlue.withOpacity(0.1),
+            color: AppTheme.accentBlue.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppTheme.accentBlue.withOpacity(0.3)),
+            border: Border.all(color: AppTheme.accentBlue.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [

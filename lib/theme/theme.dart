@@ -31,12 +31,10 @@ class AppTheme {
         primary: neonGreen,
         secondary: accentBlue,
         surface: secondaryBlack,
-        background: backgroundDark,
         error: dangerRed,
         onPrimary: Colors.black,
         onSecondary: Colors.black,
         onSurface: Colors.white,
-        onBackground: Colors.white,
         onError: Colors.black,
       ),
       textTheme: TextTheme(

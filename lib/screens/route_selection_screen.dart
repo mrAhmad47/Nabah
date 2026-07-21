@@ -6,7 +6,6 @@ import '../theme/theme.dart';
 import '../components/neon_button.dart';
 import '../services/incident_database.dart';
 import '../services/directions_service.dart';
-import '../services/natlas_service.dart';
 import '../services/route_safety_news_service.dart';
 import '../services/route_intersection_service.dart';
 import '../services/route_safety_cache.dart';
@@ -24,7 +23,6 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
   final TextEditingController _toController = TextEditingController();
   final IncidentDatabase _incidentDb = IncidentDatabase.instance;
   final DirectionsService _directionsService = DirectionsService.instance;
-  final NAtlasService _natlasService = NAtlasService.instance;
   final RouteIntersectionService _intersectionService = RouteIntersectionService.instance;
 
   // State
@@ -38,10 +36,9 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
   
   // Intersection state
   List<RouteIntersection> _intersections = [];
-  SwitchRecommendation? _switchRecommendation;
 
   // Map state
-  latlong2.LatLng _mapCenter = latlong2.LatLng(9.0820, 8.6753); // Nigeria center
+  latlong2.LatLng _mapCenter = const latlong2.LatLng(9.0820, 8.6753); // Nigeria center
   double _mapZoom = 6.0;
 
   @override
@@ -76,6 +73,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
       );
 
       if (routes.isEmpty) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Could not find routes. Try different locations.')),
         );
@@ -105,6 +103,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
       await _analyzeRouteSafety();
       
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isCalculating = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
@@ -202,7 +201,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
         'safetyLevel': safetyLevel,
         'warnings': warnings,
       });
-      debugPrint('💾 Cached safety data for ${fromText} → ${toText}');
+      debugPrint('💾 Cached safety data for $fromText → $toText');
 
       setState(() {
         _routes[i].safetyScore = safetyScore;
@@ -281,7 +280,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
             color: AppTheme.neonGreen,
             shape: BoxShape.circle,
             border: Border.all(color: Colors.white, width: 3),
-            boxShadow: [BoxShadow(color: AppTheme.neonGreen.withOpacity(0.5), blurRadius: 10)],
+            boxShadow: [BoxShadow(color: AppTheme.neonGreen.withValues(alpha: 0.5), blurRadius: 10)],
           ),
           child: const Icon(Icons.play_arrow, color: Colors.white, size: 24),
         ),
@@ -297,7 +296,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
             color: AppTheme.accentBlue,
             shape: BoxShape.circle,
             border: Border.all(color: Colors.white, width: 3),
-            boxShadow: [BoxShadow(color: AppTheme.accentBlue.withOpacity(0.5), blurRadius: 10)],
+            boxShadow: [BoxShadow(color: AppTheme.accentBlue.withValues(alpha: 0.5), blurRadius: 10)],
           ),
           child: const Icon(Icons.flag, color: Colors.white, size: 24),
         ),
@@ -350,7 +349,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
                 height: 50,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.purple.withOpacity(0.2),
+                  color: Colors.purple.withValues(alpha: 0.2),
                   border: Border.all(color: Colors.purple, width: 2),
                 ),
               ),
@@ -364,7 +363,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
                   border: Border.all(color: Colors.white, width: 2),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.purple.withOpacity(0.6),
+                      color: Colors.purple.withValues(alpha: 0.6),
                       blurRadius: 10,
                       spreadRadius: 2,
                     ),
@@ -413,7 +412,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
         // Create dashed connector line
         connectors.add(MapPolyline(
           points: [point.location, closestPoint],
-          color: Colors.purple.withOpacity(0.7),
+          color: Colors.purple.withValues(alpha: 0.7),
           width: 3.0,
           isDashed: true,
         ));
@@ -591,11 +590,11 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.backgroundDark.withOpacity(0.95),
+        color: AppTheme.backgroundDark.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.neonGreen.withOpacity(0.3)),
+        border: Border.all(color: AppTheme.neonGreen.withValues(alpha: 0.3)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 10),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 10),
         ],
       ),
       child: Column(
@@ -676,14 +675,14 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
         margin: const EdgeInsets.only(right: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppTheme.backgroundDark.withOpacity(0.97),
+          color: AppTheme.backgroundDark.withValues(alpha: 0.97),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? route.routeColor : Colors.grey.withOpacity(0.3),
+            color: isSelected ? route.routeColor : Colors.grey.withValues(alpha: 0.3),
             width: isSelected ? 2 : 1,
           ),
           boxShadow: isSelected
-              ? [BoxShadow(color: route.routeColor.withOpacity(0.35), blurRadius: 14)]
+              ? [BoxShadow(color: route.routeColor.withValues(alpha: 0.35), blurRadius: 14)]
               : null,
         ),
         child: Column(
@@ -701,7 +700,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
                           margin: const EdgeInsets.only(right: 6),
                           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppTheme.neonGreen.withOpacity(0.2),
+                            color: AppTheme.neonGreen.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Text(
@@ -731,7 +730,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: route.routeColor.withOpacity(0.2),
+                    color: route.routeColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -845,7 +844,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8),
             ),
             child: TextField(
@@ -889,15 +888,15 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.purple.withOpacity(0.9),
-            Colors.deepPurple.withOpacity(0.9),
+            Colors.purple.withValues(alpha: 0.9),
+            Colors.deepPurple.withValues(alpha: 0.9),
           ],
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.purpleAccent, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.purple.withOpacity(0.4),
+            color: Colors.purple.withValues(alpha: 0.4),
             blurRadius: 10,
             spreadRadius: 2,
           ),
@@ -924,13 +923,13 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
                 Text(
                   '${relevantIntersections.length} intersection${relevantIntersections.length > 1 ? 's' : ''} with ${alternativeRoute.routeName}',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontSize: 12,
                   ),
                 ),
                 if (safetyDiff > 0)
                   Text(
-                    '+${safetyDiff}% safer',
+                    '+$safetyDiff% safer',
                     style: const TextStyle(
                       color: AppTheme.neonGreen,
                       fontSize: 12,

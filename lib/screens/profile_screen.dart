@@ -159,7 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            AppTheme.neonGreen.withOpacity(0.1),
+            AppTheme.neonGreen.withValues(alpha: 0.1),
             AppTheme.backgroundDark,
           ],
         ),
@@ -177,15 +177,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   border: Border.all(color: AppTheme.neonGreen, width: 3),
                   boxShadow: [
                     BoxShadow(
-                      color: AppTheme.neonGreen.withOpacity(0.4),
+                      color: AppTheme.neonGreen.withValues(alpha: 0.4),
                       blurRadius: 20,
                     ),
                   ],
                 ),
-                child: CircleAvatar(
+                child: const CircleAvatar(
                   radius: 48,
                   backgroundColor: AppTheme.backgroundDark,
-                  child: const Icon(
+                  child: Icon(
                     Icons.person,
                     size: 50,
                     color: AppTheme.neonGreen,
@@ -239,13 +239,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppTheme.neonGreen.withOpacity(0.2),
+              color: AppTheme.neonGreen.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppTheme.neonGreen.withOpacity(0.5)),
+              border: Border.all(color: AppTheme.neonGreen.withValues(alpha: 0.5)),
             ),
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 Icon(Icons.verified, size: 16, color: AppTheme.neonGreen),
                 SizedBox(width: 4),
                 Text(
@@ -283,7 +283,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white10),
       ),
@@ -326,7 +326,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildSettingsCard(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white10),
       ),
@@ -351,7 +351,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(color: Colors.white.withOpacity(0.05)),
+            bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
           ),
         ),
         child: Row(
@@ -360,7 +360,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: color, size: 20),
@@ -409,7 +409,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: Colors.white.withOpacity(0.05)),
+          bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
         ),
       ),
       child: Row(
@@ -418,7 +418,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: AppTheme.neonGreen.withOpacity(0.1),
+              color: AppTheme.neonGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: AppTheme.neonGreen, size: 20),
@@ -449,8 +449,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppTheme.neonGreen,
-            activeTrackColor: AppTheme.neonGreen.withOpacity(0.3),
+            activeThumbColor: AppTheme.neonGreen,
+            activeTrackColor: AppTheme.neonGreen.withValues(alpha: 0.3),
           ),
         ],
       ),
@@ -502,8 +502,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: Colors.redAccent),
         ),
-        title: Row(
-          children: const [
+        title: const Row(
+          children: [
             Icon(Icons.warning, color: Colors.redAccent),
             SizedBox(width: 8),
             Text('Delete Account', style: TextStyle(color: Colors.redAccent)),

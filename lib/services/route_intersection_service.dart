@@ -196,11 +196,11 @@ class RouteIntersectionService {
     final scoreDiff = alternative.safetyScore - current.safetyScore;
     
     if (scoreDiff > 20) {
-      return 'Much safer route available! +${scoreDiff}% safety improvement.';
+      return 'Much safer route available! +$scoreDiff% safety improvement.';
     } else if (scoreDiff > 10) {
-      return 'Safer alternative detected. +${scoreDiff}% safety improvement.';
+      return 'Safer alternative detected. +$scoreDiff% safety improvement.';
     } else {
-      return 'Slightly safer option available. +${scoreDiff}% improvement.';
+      return 'Slightly safer option available. +$scoreDiff% improvement.';
     }
   }
 }
@@ -245,9 +245,9 @@ class IntersectionPoint {
   
   String getProgressDescription(int forRouteIndex) {
     if (forRouteIndex == route1Index) {
-      return '${route1ProgressPercent}% along route (${route1DistanceKm.toStringAsFixed(0)}km)';
+      return '$route1ProgressPercent% along route (${route1DistanceKm.toStringAsFixed(0)}km)';
     } else {
-      return '${route2ProgressPercent}% along route (${route2DistanceKm.toStringAsFixed(0)}km)';
+      return '$route2ProgressPercent% along route (${route2DistanceKm.toStringAsFixed(0)}km)';
     }
   }
 }
@@ -271,6 +271,6 @@ class SwitchRecommendation {
   });
   
   String get summaryText {
-    return 'Switch to ${recommendedRoute.routeName} in ${distanceToSwitchKm.toStringAsFixed(1)}km for +${safetyImprovement}% safety';
+    return 'Switch to ${recommendedRoute.routeName} in ${distanceToSwitchKm.toStringAsFixed(1)}km for +$safetyImprovement% safety';
   }
 }

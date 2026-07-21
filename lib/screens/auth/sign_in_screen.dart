@@ -115,7 +115,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     labelStyle: TextStyle(color: Colors.grey[400]),
                     prefixIcon: const Icon(Icons.email_outlined, color: AppTheme.accentBlue),
                     filled: true,
-                    fillColor: Colors.white.withOpacity(0.05),
+                    fillColor: Colors.white.withValues(alpha: 0.05),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.white10),
@@ -159,7 +159,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                     ),
                     filled: true,
-                    fillColor: Colors.white.withOpacity(0.05),
+                    fillColor: Colors.white.withValues(alpha: 0.05),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.white10),

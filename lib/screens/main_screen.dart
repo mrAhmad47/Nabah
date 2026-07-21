@@ -48,10 +48,10 @@ class _MainScreenState extends State<MainScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1))),
+          border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
         ),
         child: BottomNavigationBar(
-          backgroundColor: AppTheme.backgroundDark.withOpacity(0.95),
+          backgroundColor: AppTheme.backgroundDark.withValues(alpha: 0.95),
           type: BottomNavigationBarType.fixed,
           selectedItemColor: AppTheme.neonGreen,
           unselectedItemColor: Colors.grey,

@@ -26,11 +26,11 @@ class WelcomeScreen extends StatelessWidget {
                 height: 120,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppTheme.neonGreen.withOpacity(0.1),
+                  color: AppTheme.neonGreen.withValues(alpha: 0.1),
                   border: Border.all(color: AppTheme.neonGreen, width: 3),
                   boxShadow: [
                     BoxShadow(
-                      color: AppTheme.neonGreen.withOpacity(0.3),
+                      color: AppTheme.neonGreen.withValues(alpha: 0.3),
                       blurRadius: 30,
                       spreadRadius: 5,
                     ),
@@ -132,7 +132,7 @@ class WelcomeScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppTheme.accentBlue.withOpacity(0.1),
+            color: AppTheme.accentBlue.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: AppTheme.accentBlue, size: 24),

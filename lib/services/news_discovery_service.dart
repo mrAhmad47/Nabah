@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:latlong2/latlong.dart';
+import '../config/api_config.dart';
 import '../models/incident_report.dart';
 
 /// Service to discover incidents from news sources
@@ -9,10 +10,7 @@ class NewsDiscoveryService {
   static final NewsDiscoveryService instance = NewsDiscoveryService._();
   NewsDiscoveryService._();
 
-  // Auto-detect platform: localhost for web, WiFi IP for mobile
-  static String get serverUrl => kIsWeb
-      ? 'http://127.0.0.1:8765'
-      : 'http://10.227.22.32:8765';
+  static String get serverUrl => ApiConfig.natlasServerUrl;
 
   DateTime? _lastFetchTime;
   List<IncidentReport> _cachedIncidents = [];

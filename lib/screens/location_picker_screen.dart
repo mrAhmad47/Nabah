@@ -159,7 +159,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withOpacity(0.7),
+                      Colors.black.withValues(alpha: 0.7),
                       Colors.transparent,
                     ],
                   ),
@@ -205,7 +205,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     blurRadius: 20,
                     offset: const Offset(0, -5),
                   ),
@@ -221,7 +221,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: AppTheme.neonGreen.withOpacity(0.2),
+                          color: AppTheme.neonGreen.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(

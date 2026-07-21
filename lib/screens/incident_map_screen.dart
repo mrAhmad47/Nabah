@@ -57,7 +57,7 @@ class IncidentMapScreen extends StatelessWidget {
                       border: Border.all(color: Colors.white, width: 4),
                       boxShadow: [
                         BoxShadow(
-                          color: _severityColor.withOpacity(0.6),
+                          color: _severityColor.withValues(alpha: 0.6),
                           blurRadius: 20,
                           spreadRadius: 5,
                         ),
@@ -99,12 +99,12 @@ class IncidentMapScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.backgroundDark.withOpacity(0.95),
+                color: AppTheme.backgroundDark.withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: _severityColor.withOpacity(0.5)),
+                border: Border.all(color: _severityColor.withValues(alpha: 0.5)),
                 boxShadow: [
                   BoxShadow(
-                    color: _severityColor.withOpacity(0.2),
+                    color: _severityColor.withValues(alpha: 0.2),
                     blurRadius: 15,
                   ),
                 ],
@@ -118,7 +118,7 @@ class IncidentMapScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: _severityColor.withOpacity(0.2),
+                          color: _severityColor.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(Icons.warning, color: _severityColor, size: 24),
@@ -147,7 +147,7 @@ class IncidentMapScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: _severityColor.withOpacity(0.2),
+                          color: _severityColor.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(

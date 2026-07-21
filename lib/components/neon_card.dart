@@ -16,7 +16,7 @@ class NeonCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: AppTheme.secondaryBlack.withOpacity(0.8), // Frosted feel
+        color: AppTheme.secondaryBlack.withValues(alpha: 0.8), // Frosted feel
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: hasGlow ? AppTheme.neonGreen : Colors.white10,
@@ -25,7 +25,7 @@ class NeonCard extends StatelessWidget {
         boxShadow: hasGlow
             ? [
                 BoxShadow(
-                  color: AppTheme.neonGreen.withOpacity(0.2),
+                  color: AppTheme.neonGreen.withValues(alpha: 0.2),
                   blurRadius: 8,
                   spreadRadius: 0,
                 )

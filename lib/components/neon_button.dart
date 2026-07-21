@@ -23,7 +23,7 @@ class NeonButton extends StatelessWidget {
         boxShadow: isPrimary && !isLoading && onPressed != null
             ? [
                 BoxShadow(
-                  color: AppTheme.neonGreen.withOpacity(0.4),
+                  color: AppTheme.neonGreen.withValues(alpha: 0.4),
                   blurRadius: 10,
                   spreadRadius: 1,
                 )
@@ -34,7 +34,7 @@ class NeonButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: isPrimary ? AppTheme.neonGreen : Colors.transparent,
           foregroundColor: isPrimary ? Colors.black : AppTheme.neonGreen,
-          disabledBackgroundColor: isPrimary ? AppTheme.neonGreen.withOpacity(0.5) : Colors.transparent,
+          disabledBackgroundColor: isPrimary ? AppTheme.neonGreen.withValues(alpha: 0.5) : Colors.transparent,
           side: isPrimary ? BorderSide.none : const BorderSide(color: AppTheme.neonGreen, width: 1.5),
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           shape: RoundedRectangleBorder(

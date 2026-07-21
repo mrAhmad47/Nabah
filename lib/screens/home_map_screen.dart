@@ -132,12 +132,12 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
             decoration: BoxDecoration(
               color: const Color(0xFF0A0A0A),
               image: DecorationImage(
-                image: NetworkImage(
+                image: const NetworkImage(
                   "https://lh3.googleusercontent.com/aida-public/AB6AXuCg7C76ohZ4o2us3crTSCsf33WFBrqCcpMcLwd0AAEiXLRBb5vQiqRNMe_NMdjNIxIajtLJf5QoRuZFAb7HIChnZ3n8m5tSYO1QHttkdfxxAqsedkc0kS4cBKFciM6DeCgdPB7vwq5f5MhIT9C2a3NojvAz8JkVlgUpMNd83mgXe0_sMbLskiTLFJoPH7z_e9VHdl3otPimXs3ucx2HAD504Sf2i_TVOa4Rol9WpVRAoiDPMkr92fI5jDcQxySMRl2jPzIOjlAAFwTg",
                 ),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.6),
+                  Colors.black.withValues(alpha: 0.6),
                   BlendMode.darken,
                 ),
               ),
@@ -165,7 +165,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(Icons.person, color: Colors.white),
@@ -188,7 +188,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.white10),
                   ),
@@ -198,7 +198,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: AppTheme.neonGreen.withOpacity(0.2),
+                          color: AppTheme.neonGreen.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(Icons.location_on, color: AppTheme.neonGreen),
@@ -246,9 +246,9 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: _riskColor.withOpacity(0.15),
+                                color: _riskColor.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: _riskColor.withOpacity(0.4)),
+                                border: Border.all(color: _riskColor.withValues(alpha: 0.4)),
                               ),
                               child: Text(
                                 '$_areaSafetyScore%',
@@ -294,7 +294,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                       Text(
                         _isLoadingNews ? '' : 'Updated: $_lastUpdated',
                         style: AppTheme.bodyStyle.copyWith(
-                          color: _riskColor.withOpacity(0.7),
+                          color: _riskColor.withValues(alpha: 0.7),
                           fontSize: 12,
                         ),
                       ),
@@ -345,7 +345,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                     child: Text(
                       'Check Another Location',
                       style: AppTheme.bodyStyle.copyWith(
-                        color: AppTheme.neonGreen.withOpacity(0.7),
+                        color: AppTheme.neonGreen.withValues(alpha: 0.7),
                         decoration: TextDecoration.underline,
                         fontSize: 14,
                       ),
@@ -401,7 +401,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                 // Safety Statistics Strip
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.white10),
                   ),
@@ -432,7 +432,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(16),
                       topRight: Radius.circular(16),
@@ -535,9 +535,9 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -545,7 +545,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(iconData, color: color, size: 20),
@@ -566,7 +566,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                 Text(
                   '${alert.location} — ${alert.description}',
                   style: TextStyle(
-                    color: AppTheme.neonGreen.withOpacity(0.7),
+                    color: AppTheme.neonGreen.withValues(alpha: 0.7),
                     fontSize: 12,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -587,7 +587,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -628,7 +628,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
+        color: Colors.black.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white10),
       ),
@@ -637,7 +637,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppTheme.neonGreen.withOpacity(0.2),
+              color: AppTheme.neonGreen.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: AppTheme.neonGreen),
@@ -675,7 +675,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
               label,
               style: TextStyle(
                 fontSize: 11,
-                color: AppTheme.neonGreen.withOpacity(0.7),
+                color: AppTheme.neonGreen.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -697,7 +697,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -706,7 +706,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Color(bgHex).withOpacity(0.2),
+              color: Color(bgHex).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: iconColor),
@@ -727,7 +727,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: AppTheme.neonGreen.withOpacity(0.7),
+                    color: AppTheme.neonGreen.withValues(alpha: 0.7),
                     fontSize: 14,
                   ),
                   overflow: TextOverflow.ellipsis,

@@ -44,7 +44,7 @@ class IncidentService {
       IncidentReport(
         id: '1',
         type: 'Robbery',
-        location: latlong2.LatLng(6.5244, 3.3792), // Lagos
+        location: const latlong2.LatLng(6.5244, 3.3792), // Lagos
         locationName: 'Wuse Zone 4',
         timestamp: now.subtract(const Duration(minutes: 15)),
         description: 'Armed robbery reported near the main transit hub.',
@@ -55,7 +55,7 @@ class IncidentService {
       IncidentReport(
         id: '2',
         type: 'Accident',
-        location: latlong2.LatLng(6.5300, 3.3850),
+        location: const latlong2.LatLng(6.5300, 3.3850),
         locationName: 'Main St Bridge',
         timestamp: now.subtract(const Duration(minutes: 45)),
         description: 'Road accident causing traffic delays.',
@@ -66,7 +66,7 @@ class IncidentService {
       IncidentReport(
         id: '3',
         type: 'Suspicious Activity',
-        location: latlong2.LatLng(6.5200, 3.3750),
+        location: const latlong2.LatLng(6.5200, 3.3750),
         locationName: 'Union Square',
         timestamp: now.subtract(const Duration(hours: 1)),
         description: 'Suspicious individuals loitering in the area.',
@@ -77,7 +77,7 @@ class IncidentService {
       IncidentReport(
         id: '4',
         type: 'Accident',
-        location: latlong2.LatLng(6.5350, 3.3900),
+        location: const latlong2.LatLng(6.5350, 3.3900),
         locationName: 'Central Area',
         timestamp: now.subtract(const Duration(hours: 2)),
         description: 'Vehicle collision at intersection.',

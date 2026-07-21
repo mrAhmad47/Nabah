@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../config/api_config.dart';
 
 /// N-ATLaS AI Service for incident analysis and news processing
 /// 
@@ -9,10 +10,7 @@ import 'package:http/http.dart' as http;
 class NAtlasService {
   static final NAtlasService instance = NAtlasService._init();
   
-  // Server configuration - auto-detects platform
-  static String get serverUrl => kIsWeb
-      ? 'http://127.0.0.1:8765'  // Web: localhost
-      : 'http://10.227.22.98:8765';  // Mobile: WiFi IP
+  static String get serverUrl => ApiConfig.natlasServerUrl;
   static const String modelPath = 'models/N-ATLaS.Q2_K.gguf';
   
   bool _isServerRunning = false;
@@ -183,7 +181,7 @@ class NAtlasService {
       severity: severity,
       confidence: 0.75,
       summary: detectedType != null 
-          ? 'Detected potential ${detectedType} incident in the text.'
+          ? 'Detected potential $detectedType incident in the text.'
           : 'No safety incidents detected in the provided text.',
       suggestedLocation: null,
     );

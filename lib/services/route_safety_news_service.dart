@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../config/api_config.dart';
 import 'reverse_geocoding_service.dart';
 import 'directions_service.dart';
 
@@ -13,10 +14,7 @@ import 'directions_service.dart';
 class RouteSafetyNewsService {
   static final RouteSafetyNewsService instance = RouteSafetyNewsService._init();
   
-  // Auto-detect platform: localhost for web, WiFi IP for mobile
-  static String get _serverUrl => kIsWeb
-      ? 'http://127.0.0.1:8765'
-      : 'http://10.227.22.98:8765';
+  static String get _serverUrl => ApiConfig.natlasServerUrl;
   
   final _geocodingService = ReverseGeocodingService.instance;
   

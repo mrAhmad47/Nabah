@@ -169,7 +169,7 @@ class _GoogleMapWithPolylineState extends State<_GoogleMapWithPolyline> {
           circleId: CircleId('circle_$i'),
           center: LatLng(c.center.latitude, c.center.longitude),
           radius: c.radius,
-          fillColor: c.color.withOpacity(c.opacity),
+          fillColor: c.color.withValues(alpha: c.opacity),
           strokeColor: c.color,
           strokeWidth: 2,
         ));

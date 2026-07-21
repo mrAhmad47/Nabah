@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -91,8 +90,7 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
               onPrimary: Colors.black,
               surface: AppTheme.backgroundDark,
               onSurface: Colors.white,
-            ),
-            dialogBackgroundColor: AppTheme.backgroundDark,
+            ), dialogTheme: const DialogThemeData(backgroundColor: AppTheme.backgroundDark),
           ),
           child: child!,
         );
@@ -116,8 +114,7 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
               onPrimary: Colors.black,
               surface: AppTheme.backgroundDark,
               onSurface: Colors.white,
-            ),
-            dialogBackgroundColor: AppTheme.backgroundDark,
+            ), dialogTheme: const DialogThemeData(backgroundColor: AppTheme.backgroundDark),
           ),
           child: child!,
         );
@@ -210,7 +207,7 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: AppTheme.backgroundDark,
-                border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.1))),
+                border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -265,7 +262,7 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
                                   border: Border.all(color: AppTheme.accentBlue),
                                   borderRadius: BorderRadius.circular(24),
                                   boxShadow: isSelected
-                                      ? [BoxShadow(color: AppTheme.neonGreen.withOpacity(0.4), blurRadius: 10)]
+                                      ? [BoxShadow(color: AppTheme.neonGreen.withValues(alpha: 0.4), blurRadius: 10)]
                                       : [],
                                 ),
                                 child: Text(
@@ -288,7 +285,7 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
+                        color: Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
@@ -365,7 +362,7 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: Colors.white.withOpacity(0.05),
+                        fillColor: Colors.white.withValues(alpha: 0.05),
                         hintText: 'Please provide as much detail as possible...',
                         hintStyle: TextStyle(color: Colors.grey[600]),
                         border: OutlineInputBorder(
@@ -394,12 +391,12 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppTheme.neonGreen.withOpacity(0.1),
+                        color: AppTheme.neonGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppTheme.neonGreen.withOpacity(0.3)),
+                        border: Border.all(color: AppTheme.neonGreen.withValues(alpha: 0.3)),
                       ),
-                      child: Row(
-                        children: const [
+                      child: const Row(
+                        children: [
                           Icon(Icons.auto_awesome, color: AppTheme.neonGreen),
                           SizedBox(width: 8),
                           Expanded(
@@ -449,9 +446,9 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.accentBlue.withOpacity(0.5)),
+        border: Border.all(color: AppTheme.accentBlue.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -601,7 +598,7 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
                 decoration: BoxDecoration(
                   color: Colors.black26,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppTheme.accentBlue.withOpacity(0.3)),
+                  border: Border.all(color: AppTheme.accentBlue.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -642,7 +639,7 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
         decoration: BoxDecoration(
           color: AppTheme.backgroundDark,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.withOpacity(0.5)),
+          border: Border.all(color: Colors.grey.withValues(alpha: 0.5)),
         ),
         child: Column(
           children: [
@@ -659,7 +656,7 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(label, style: TextStyle(color: Colors.grey[500], fontSize: 11)),
@@ -677,7 +674,7 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.white10),
             ),
@@ -752,8 +749,8 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
           barrierDismissible: false,
           builder: (dialogContext) => AlertDialog(
             backgroundColor: AppTheme.backgroundDark,
-            title: Row(
-              children: const [
+            title: const Row(
+              children: [
                 Icon(Icons.check_circle, color: AppTheme.neonGreen, size: 32),
                 SizedBox(width: 12),
                 Text('Success!', style: TextStyle(color: AppTheme.neonGreen)),

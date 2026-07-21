@@ -79,7 +79,7 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
       IncidentReport(
         id: 'mock1',
         type: 'Robbery',
-        location: latlong2.LatLng(6.5244, 3.3792), // Lagos
+        location: const latlong2.LatLng(6.5244, 3.3792), // Lagos
         locationName: 'Wuse Zone 4',
         timestamp: now.subtract(const Duration(minutes: 15)),
         description: 'Armed robbery reported near transit hub',
@@ -90,7 +90,7 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
       IncidentReport(
         id: 'mock2',
         type: 'Accident',
-        location: latlong2.LatLng(6.5300, 3.3850),
+        location: const latlong2.LatLng(6.5300, 3.3850),
         locationName: 'Main St Bridge',
         timestamp: now.subtract(const Duration(hours: 2)),
         description: 'Traffic accident causing delays',
@@ -101,7 +101,7 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
       IncidentReport(
         id: 'mock3',
         type: 'Harassment',
-        location: latlong2.LatLng(6.5200, 3.3700),
+        location: const latlong2.LatLng(6.5200, 3.3700),
         locationName: 'Central Market',
         timestamp: now.subtract(const Duration(hours: 4)),
         description: 'Harassment incident reported',
@@ -253,7 +253,7 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: AppTheme.neonGreen.withOpacity(0.2),
+            color: AppTheme.neonGreen.withValues(alpha: 0.2),
             shape: BoxShape.circle,
           ),
         ),
@@ -266,7 +266,7 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
             border: Border.all(color: Colors.white, width: 2),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.neonGreen.withOpacity(0.8),
+                color: AppTheme.neonGreen.withValues(alpha: 0.8),
                 blurRadius: 8,
               )
             ]
@@ -291,11 +291,11 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
           onTap: () => setState(() => _selectedIncident = incident),
           child: Container(
             decoration: BoxDecoration(
-              color: color.withOpacity(0.9),
+              color: color.withValues(alpha: 0.9),
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2),
               boxShadow: [
-                BoxShadow(color: color.withOpacity(0.5), blurRadius: 8),
+                BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 8),
               ],
             ),
             child: Icon(
@@ -334,10 +334,10 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
                    begin: Alignment.topCenter,
                    end: Alignment.bottomCenter,
                    colors: [
-                     Colors.black.withOpacity(0.7),
+                     Colors.black.withValues(alpha: 0.7),
                      Colors.transparent,
                      Colors.transparent,
-                     Colors.black.withOpacity(0.7),
+                     Colors.black.withValues(alpha: 0.7),
                    ],
                    stops: const [0.0, 0.2, 0.8, 1.0],
                  ),
@@ -450,12 +450,12 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.8),
+                color: Colors.black.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.white10),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     blurRadius: 10,
                   )
                 ]
@@ -471,7 +471,7 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: AppTheme.neonGreen.withOpacity(0.2),
+                        color: AppTheme.neonGreen.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -561,12 +561,12 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.8),
+                color: Colors.black.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.neonGreen)),
                   SizedBox(width: 12),
                   Text('Loading incidents...', style: TextStyle(color: Colors.white70)),
@@ -594,7 +594,7 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: severityColor.withOpacity(0.2),
+                  color: severityColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(_getIncidentIcon(incident.type), color: severityColor, size: 24),
@@ -618,7 +618,7 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: severityColor.withOpacity(0.2),
+                            color: severityColor.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Row(
@@ -749,7 +749,7 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: isActive ? AppTheme.neonGreen : Colors.white.withOpacity(0.1),
+        color: isActive ? AppTheme.neonGreen : Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: isActive ? AppTheme.neonGreen : Colors.white24),
       ),

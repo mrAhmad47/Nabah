@@ -65,7 +65,7 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
         slivers: [
           // Custom App Bar as Sliver
           SliverAppBar(
-            backgroundColor: AppTheme.backgroundDark.withOpacity(0.9),
+            backgroundColor: AppTheme.backgroundDark.withValues(alpha: 0.9),
             title: Text(
               'Incident Details',
               style: AppTheme.titleStyle.copyWith(
@@ -111,7 +111,7 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: AppTheme.neonGreen.withOpacity(0.2),
+                                color: AppTheme.neonGreen.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Text(
@@ -126,11 +126,11 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                border: Border.all(color: AppTheme.accentBlue.withOpacity(0.5)),
+                                border: Border.all(color: AppTheme.accentBlue.withValues(alpha: 0.5)),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: Row(
-                                children: const [
+                              child: const Row(
+                                children: [
                                   Icon(Icons.verified, size: 16, color: AppTheme.accentBlue),
                                   SizedBox(width: 4),
                                   Text(
@@ -192,7 +192,7 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                        color: AppTheme.secondaryBlack,
-                       border: Border.all(color: AppTheme.accentBlue.withOpacity(0.3)),
+                       border: Border.all(color: AppTheme.accentBlue.withValues(alpha: 0.3)),
                        borderRadius: BorderRadius.circular(8)
                     ),
                     child: Column(
@@ -201,7 +201,7 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
                          Row(
                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                            children: [
-                             Text("N-ATLaS AI Analysis", style: TextStyle(color: AppTheme.accentBlue, fontWeight: FontWeight.bold)),
+                             const Text("N-ATLaS AI Analysis", style: TextStyle(color: AppTheme.accentBlue, fontWeight: FontWeight.bold)),
                              if (_isAnalyzing)
                                const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.accentBlue)),
                            ],
@@ -235,14 +235,14 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppTheme.neonGreen.withOpacity(0.5)),
+                      border: Border.all(color: AppTheme.neonGreen.withValues(alpha: 0.5)),
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.neonGreen.withOpacity(0.1),
+                          color: AppTheme.neonGreen.withValues(alpha: 0.1),
                           blurRadius: 10,
                         )
                       ],
-                      image: DecorationImage(
+                      image: const DecorationImage(
                         image: NetworkImage("https://lh3.googleusercontent.com/aida-public/AB6AXuCTJdMHAXs6pSqsNV6XCID1GpgsTQJghr41m-HA4lswaeKTgCKgbVY59RozyJI966Mf9etoYYluryf7uQnlo-Yib3_Z7RLXNvhYZzsRO9Hs161QNesGhe7Ovts_AP9HwDAe6kpdivCqzBR2WYmYLo6dXUOk75xRm7h9bAjFlvkab7l33o-7mTacnu8pMYkCdAA8fIYBTLRuhTJrlEFOefLs3qdxMtMPEWxwe7cpGwHNNOlSwzMNrALgpjnmc0dJGnQxzgco5ZaYCZFD"),
                         fit: BoxFit.cover,
                       ),
@@ -264,7 +264,7 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
                                    builder: (context) => IncidentMapScreen(
                                      incidentType: 'ASSAULT',
                                      locationName: 'Sector 7 Cyber District',
-                                     location: latlong2.LatLng(6.5244, 3.3792), // Sample location
+                                     location: const latlong2.LatLng(6.5244, 3.3792), // Sample location
                                      severity: 75,
                                      description: _incidentDescription,
                                    ),
@@ -303,9 +303,9 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                      decoration: BoxDecoration(
-                       color: AppTheme.secondaryBlack.withOpacity(0.6),
+                       color: AppTheme.secondaryBlack.withValues(alpha: 0.6),
                        borderRadius: BorderRadius.circular(16),
-                       border: Border.all(color: AppTheme.neonGreen.withOpacity(0.2)),
+                       border: Border.all(color: AppTheme.neonGreen.withValues(alpha: 0.2)),
                      ),
                      child: Column(
                        crossAxisAlignment: CrossAxisAlignment.start,
@@ -344,15 +344,15 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
                   // Confidence Score
                   NeonCard(
                     hasGlow: true,
-                    child: Container(
-                      width: double.infinity,
+                      child: SizedBox(
+                        width: double.infinity,
                       child: Column(
                         children: [
                           RichText(
-                            text: TextSpan(
-                              style: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                            text: const TextSpan(
+                              style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                               children: [
-                                const TextSpan(text: 'Severity Estimate: '),
+                                TextSpan(text: 'Severity Estimate: '),
                                 TextSpan(text: 'Moderate (62%)', style: TextStyle(color: AppTheme.neonGreen)),
                               ],
                             ),
@@ -419,7 +419,7 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.accentBlue.withOpacity(0.2) : Colors.transparent,
+          color: isSelected ? AppTheme.accentBlue.withValues(alpha: 0.2) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: isSelected ? AppTheme.accentBlue : Colors.grey[800]!),
         ),
@@ -484,7 +484,7 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
                   width: 12,
                   height: 12,
                   decoration: BoxDecoration(
-                    color: AppTheme.neonGreen.withOpacity(0.2),
+                    color: AppTheme.neonGreen.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                     border: Border.all(color: AppTheme.neonGreen, width: 2),
                   ),
@@ -493,7 +493,7 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
                    Expanded(
                      child: Container(
                        width: 2,
-                       color: AppTheme.neonGreen.withOpacity(0.3),
+                       color: AppTheme.neonGreen.withValues(alpha: 0.3),
                        margin: const EdgeInsets.only(bottom: 2),
                      ),
                    )

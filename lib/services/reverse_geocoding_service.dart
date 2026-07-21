@@ -88,7 +88,7 @@ class ReverseGeocodingService {
     seenTowns.add(originClean.toLowerCase());
     
     // Calculate route length to determine sampling frequency
-    final distance = latlong2.Distance();
+    const distance = latlong2.Distance();
     double totalDistanceKm = 0;
     
     for (int i = 0; i < routePoints.length - 1; i++) {
@@ -104,7 +104,7 @@ class ReverseGeocodingService {
     final sampleInterval = (routePoints.length / (maxTowns + 2)).ceil().clamp(3, 100);
     
     debugPrint('🗺️ Extracting towns from ${routePoints.length} route points (${totalDistanceKm.toStringAsFixed(0)}km)');
-    debugPrint('📏 Sampling every ${sampleInterval} points (max $maxTowns towns)...');
+    debugPrint('📏 Sampling every $sampleInterval points (max $maxTowns towns)...');
     
     // Sample points at regular intervals
     for (int i = sampleInterval; i < routePoints.length - sampleInterval; i += sampleInterval) {

@@ -30,8 +30,28 @@ class IncidentDatabasePlatform {
     int? daysBack,
   }) async {
     final all = await getIncidents(daysBack: daysBack);
-    // Simple filter — return all for now (proper distance calc on web is fine)
-    return all;
+    // Filter by approximate distance using equirectangular projection
+    return all.where((incident) {
+      final dlat = (incident.location.latitude - latitude) * 111.32;
+      final dlng = (incident.location.longitude - longitude) * 111.32 *
+          _cosApprox(latitude);
+      final distKm = _sqrt(dlat * dlat + dlng * dlng);
+      return distKm <= radiusKm;
+    }).toList();
+  }
+
+  static double _cosApprox(double latDeg) {
+    final rad = latDeg * 3.14159265 / 180.0;
+    return 1.0 - (rad * rad / 2.0);
+  }
+
+  static double _sqrt(double x) {
+    if (x <= 0) return 0;
+    double guess = x / 2.0;
+    for (int i = 0; i < 10; i++) {
+      guess = (guess + x / guess) / 2.0;
+    }
+    return guess;
   }
 
   Future<void> deleteOldIncidents({required int daysOld}) async {

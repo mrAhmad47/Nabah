@@ -90,19 +90,19 @@ class _DemoControlPanelState extends State<DemoControlPanel> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.9),
+        color: Colors.black.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.neonGreen.withOpacity(0.5)),
+        border: Border.all(color: AppTheme.neonGreen.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.science, color: AppTheme.neonGreen, size: 20),
-              const SizedBox(width: 8),
-              const Text(
+              Icon(Icons.science, color: AppTheme.neonGreen, size: 20),
+              SizedBox(width: 8),
+              Text(
                 'DEMO CONTROL PANEL',
                 style: TextStyle(
                   color: AppTheme.neonGreen,
@@ -168,8 +168,8 @@ class _DemoControlPanelState extends State<DemoControlPanel> {
           
           if (_isSimulating) ...[
             const SizedBox(height: 12),
-            Row(
-              children: const [
+            const Row(
+              children: [
                 SizedBox(
                   width: 12,
                   height: 12,

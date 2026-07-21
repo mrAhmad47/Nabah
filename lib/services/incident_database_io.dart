@@ -78,8 +78,30 @@ class IncidentDatabasePlatform {
     int? daysBack,
   }) async {
     final allIncidents = await getIncidents(daysBack: daysBack);
-    // Simple distance filtering
-    return allIncidents;
+    // Filter incidents within the specified radius using Haversine approximation
+    return allIncidents.where((incident) {
+      final dlat = (incident.location.latitude - latitude) * 111.32; // ~111km per degree lat
+      final dlng = (incident.location.longitude - longitude) * 111.32 *
+          _cosApprox(latitude);
+      final distKm = _sqrt(dlat * dlat + dlng * dlng);
+      return distKm <= radiusKm;
+    }).toList();
+  }
+
+  // Simple cosine approximation for latitude-based longitude scaling
+  static double _cosApprox(double latDeg) {
+    final rad = latDeg * 3.14159265 / 180.0;
+    return 1.0 - (rad * rad / 2.0); // Taylor series approximation
+  }
+
+  // Avoid importing dart:math just for sqrt — simple Newton's method
+  static double _sqrt(double x) {
+    if (x <= 0) return 0;
+    double guess = x / 2.0;
+    for (int i = 0; i < 10; i++) {
+      guess = (guess + x / guess) / 2.0;
+    }
+    return guess;
   }
 
   Future<void> deleteOldIncidents({required int daysOld}) async {

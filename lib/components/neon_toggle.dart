@@ -16,10 +16,10 @@ class NeonToggle extends StatelessWidget {
     return Switch(
       value: value,
       onChanged: onChanged,
-      activeColor: AppTheme.neonGreen,
-      activeTrackColor: AppTheme.neonGreen.withOpacity(0.3),
+      activeThumbColor: AppTheme.neonGreen,
+      activeTrackColor: AppTheme.neonGreen.withValues(alpha: 0.3),
       inactiveThumbColor: Colors.grey,
-      inactiveTrackColor: Colors.grey.withOpacity(0.3),
+      inactiveTrackColor: Colors.grey.withValues(alpha: 0.3),
     );
   }
 }

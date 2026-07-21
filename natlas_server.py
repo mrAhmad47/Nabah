@@ -39,15 +39,22 @@ except ImportError:
 
 NEWS_API_KEY = os.getenv('NEWS_API_KEY', 'YOUR_API_KEY_HERE')
 GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY', 'YOUR_GOOGLE_MAPS_API_KEY_HERE')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'YOUR_GEMINI_KEY_HERE')
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-3.1-flash-lite')
+GEMINI_FALLBACK_MODEL = os.getenv('GEMINI_FALLBACK_MODEL', 'gemini-2.5-flash')
 # ============================
 
 # Global model instance
 llm = None
 
 
+
 def load_model():
     """Load the N-ATLaS model"""
     global llm
+    if GEMINI_API_KEY and GEMINI_API_KEY != 'YOUR_GEMINI_KEY_HERE':
+        print("[INFO] Gemini API key configured. Skipping local model loading to save resources.")
+        return True
     try:
         from llama_cpp import Llama
         print(f"Loading model from: {MODEL_PATH}")
@@ -64,13 +71,65 @@ def load_model():
         return False
 
 
+def query_gemini_api(prompt, response_schema=None):
+    """Query Google Gemini API with fallback support using urllib"""
+    if not GEMINI_API_KEY or GEMINI_API_KEY == "YOUR_GEMINI_KEY_HERE":
+        return None
+    
+    primary_model = GEMINI_MODEL
+    fallback_model = GEMINI_FALLBACK_MODEL
+    
+    for model in [primary_model, fallback_model]:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
+        
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {"text": prompt}
+                    ]
+                }
+            ]
+        }
+        
+        if response_schema:
+            payload["generationConfig"] = {
+                "responseMimeType": "application/json",
+                "responseSchema": response_schema
+            }
+            
+        try:
+            print(f"[GEMINI] Querying Gemini API (Model: {model})...")
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode('utf-8'),
+                headers={"Content-Type": "application/json"}
+            )
+            with urllib.request.urlopen(req, timeout=10) as response:
+                res_data = json.loads(response.read().decode("utf-8"))
+                
+            candidates = res_data.get("candidates", [])
+            if candidates:
+                content = candidates[0].get("content", {})
+                parts = content.get("parts", [])
+                if parts:
+                    result_text = parts[0].get("text", "").strip()
+                    if result_text:
+                        return result_text
+        except Exception as e:
+            print(f"[WARNING] Gemini API failed for model {model}: {e}")
+            
+    return None
+
+
+
 # ==========================================
 # METHOD 1: NewsAPI.org (Most Reliable)
 # ==========================================
 def search_newsapi(query, location="Nigeria"):
     """Search using NewsAPI.org - reliable, full articles"""
     if not NEWS_API_KEY or NEWS_API_KEY == "YOUR_API_KEY_HERE":
-        print("⚠️ NewsAPI key not configured, skipping...")
+        print("[WARNING] NewsAPI key not configured, skipping...")
         return None
     
     try:
@@ -84,7 +143,7 @@ def search_newsapi(query, location="Nigeria"):
             
         if data.get("status") == "ok" and data.get("articles"):
             articles = data["articles"]
-            print(f"✅ NewsAPI: Found {len(articles)} articles for '{query}'")
+            print(f"[INFO] NewsAPI: Found {len(articles)} articles for '{query}'")
             
             return [{
                 "title": a.get("title", ""),
@@ -96,7 +155,7 @@ def search_newsapi(query, location="Nigeria"):
             } for a in articles if a.get("title")]
             
     except Exception as e:
-        print(f"⚠️ NewsAPI failed: {e}")
+        print(f"[WARNING] NewsAPI failed: {e}")
     
     return None
 
@@ -122,7 +181,7 @@ def scrape_google_news(query, location="Nigeria"):
             titles = re.findall(r'>([A-Z][^<]{30,150})</a>', html)
         
         if titles:
-            print(f"📰 Scraped {len(titles[:5])} headlines for '{query}'")
+            print(f"[INFO] Scraped {len(titles[:5])} headlines for '{query}'")
             return [{
                 "title": t.strip(),
                 "description": "",
@@ -132,7 +191,7 @@ def scrape_google_news(query, location="Nigeria"):
             } for t in titles[:5] if len(t.strip()) > 20]
             
     except Exception as e:
-        print(f"⚠️ Scraping failed: {e}")
+        print(f"[WARNING] Scraping failed: {e}")
     
     return None
 
@@ -173,7 +232,7 @@ def get_demo_news(query, location="Nigeria"):
     lower_query = query.lower()
     for key, news in demo_data.items():
         if key in lower_query or lower_query in key:
-            print(f"📋 Using demo data for '{query}'")
+            print(f"[INFO] Using demo data for '{query}'")
             return [{
                 "title": n["title"],
                 "description": f"Demo data for {location}",
@@ -298,18 +357,129 @@ Safety rating (0-100):"""
 
 def search_route_news(locations):
     """Search news for multiple locations with triple fallback"""
-    results = []
-    total_severity = 0
+    location_news_map = {}
     sources_used = set()
     
     for location in locations:
         news_items, source = search_news_triple_fallback(location)
         sources_used.add(source)
+        location_news_map[location] = (news_items, source)
+
+    # Try Gemini Batch AI first
+    if GEMINI_API_KEY and GEMINI_API_KEY != 'YOUR_GEMINI_KEY_HERE':
+        schema = {
+            "type": "OBJECT",
+            "properties": {
+                "location_reports": {
+                    "type": "ARRAY",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "location": {"type": "STRING"},
+                            "has_danger": {"type": "BOOLEAN"},
+                            "danger_type": {
+                                "type": "STRING",
+                                "enum": ["kidnapping", "crime", "security", "accident", "road", "traffic", "none"]
+                            },
+                            "severity": {"type": "INTEGER"},
+                            "summary": {"type": "STRING"}
+                        },
+                        "required": ["location", "has_danger", "danger_type", "severity", "summary"]
+                    }
+                }
+            },
+            "required": ["location_reports"]
+        }
         
+        prompt = """You are RouteGuardian AI, a travel safety assistant for Nigeria and Africa.
+Analyze safety-relevant news headlines and incident reports for each of the following locations.
+We want to detect threat levels and danger types for route planning.
+You must understand news in English, Nigerian Pidgin, Hausa, Yoruba, and Igbo.
+
+Locations and their corresponding headlines/reports:
+"""
+        for loc, (news_items, _) in location_news_map.items():
+            headlines_str = "\n".join([f"- {item['title']}" for item in news_items]) if news_items else "- No recent news reports found."
+            prompt += f"\nLocation: {loc}\nReports:\n{headlines_str}\n"
+
+        prompt += """
+For each location:
+1. Identify if the headlines indicate safety concerns. 
+   - Kidnapping, bandits, or abductions -> danger_type='kidnapping' (high severity, e.g., 70-90)
+   - Killing, shooting, theft, robbery, or clashes -> danger_type='crime' (severity 50-80)
+   - Military checkpoints, police patrols, curfews, arrests -> danger_type='security' (severity 10-30; checkpoints are usually low danger but warrant attention)
+   - Motor accidents, crashes, vehicle collisions -> danger_type='accident' (severity 40-70)
+   - Flooding, road washouts, blockages, or construction -> danger_type='road' (severity 20-50)
+   - Heavy gridlock, delays -> danger_type='traffic' (severity 10-30)
+   - No threat or positive news (e.g. 'highways remain safe') -> danger_type='none', has_danger=false, severity=0.
+2. In the 'summary', provide a brief explanation of the safety state. If headlines are in Pidgin or a local language, translate/summarize them clearly in English.
+3. Return the array of reports. Make sure to match the requested JSON schema.
+"""
+        
+        res_text = query_gemini_api(prompt, response_schema=schema)
+        reports_map = {}
+        if res_text:
+            try:
+                parsed = json.loads(res_text)
+                for r in parsed.get("location_reports", []):
+                    loc_key = r.get("location", "").lower().strip()
+                    reports_map[loc_key] = r
+            except Exception as e:
+                print(f"⚠️ Error parsing batch Gemini response: {e}")
+                
+        # Reconstruct the report list to match expected format
+        results = []
+        total_severity = 0
+        for location in locations:
+            news_items, source = location_news_map[location]
+            loc_key = location.lower().strip()
+            
+            # Find in Gemini response
+            report = None
+            # Check for exact or partial matches
+            for k, val in reports_map.items():
+                if k == loc_key or k in loc_key or loc_key in k:
+                    report = val
+                    break
+                    
+            if report:
+                analysis = {
+                    "location": location,
+                    "news_count": len(news_items),
+                    "has_danger": report.get("has_danger", False),
+                    "danger_type": report.get("danger_type", "none"),
+                    "severity": report.get("severity", 0),
+                    "source": source,
+                    "headlines": [n["title"] for n in news_items[:3]],
+                    "summary": report.get("summary", "No recent incidents reported.")
+                }
+            else:
+                # Rule-based fallback
+                analysis = analyze_news_with_ai(news_items, location, source)
+                
+            results.append(analysis)
+            total_severity += analysis.get("severity", 0)
+            
+        avg_severity = total_severity / len(locations) if locations else 0
+        safety_score = max(10, 95 - int(avg_severity * 0.7))
+        
+        return {
+            "locations_analyzed": locations,
+            "safety_score": safety_score,
+            "location_reports": results,
+            "sources_used": list(sources_used),
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    # Local N-ATLaS fallback (sequential loop)
+    results = []
+    total_severity = 0
+    for location in locations:
+        news_items, source = location_news_map[location]
         analysis = analyze_news_with_ai(news_items, location, source)
         results.append(analysis)
         total_severity += analysis.get("severity", 0)
-    
+        
     avg_severity = total_severity / len(locations) if locations else 0
     safety_score = max(10, 95 - int(avg_severity * 0.7))
     
@@ -322,12 +492,34 @@ def search_route_news(locations):
     }
 
 
-# ... (keep existing analyze_text and assess_severity functions)
-
 def analyze_text(text):
     """Analyze text for safety incidents"""
+    if GEMINI_API_KEY and GEMINI_API_KEY != 'YOUR_GEMINI_KEY_HERE':
+        schema = {
+            "type": "OBJECT",
+            "properties": {
+                "has_incident": {"type": "BOOLEAN"},
+                "type": {"type": "STRING"},
+                "severity": {"type": "NUMBER"},
+                "confidence": {"type": "NUMBER"},
+                "summary": {"type": "STRING"}
+            },
+            "required": ["has_incident", "type", "severity", "confidence", "summary"]
+        }
+        prompt = f"""Analyze the following text for safety-related incidents.
+Understand English, Pidgin, and local Nigerian languages (Hausa, Yoruba, Igbo).
+
+Text: "{text}"
+"""
+        res_text = query_gemini_api(prompt, response_schema=schema)
+        if res_text:
+            try:
+                return json.loads(res_text)
+            except Exception as e:
+                print(f"⚠️ Gemini analyze_text JSON parse failed: {e}")
+
+    # Fallback to local LLM
     global llm
-    
     if llm is None:
         return {"error": "Model not loaded"}
     
@@ -369,6 +561,24 @@ JSON Response:"""
 
 def assess_severity(description, incident_type):
     """Assess incident severity"""
+    if GEMINI_API_KEY and GEMINI_API_KEY != 'YOUR_GEMINI_KEY_HERE':
+        prompt = f"Rate severity 0-100 for this incident: Type: {incident_type}, Description: {description}. Respond with just the integer score and a brief reasoning in JSON format matching the schema."
+        schema = {
+            "type": "OBJECT",
+            "properties": {
+                "severity": {"type": "INTEGER"},
+                "reasoning": {"type": "STRING"}
+            },
+            "required": ["severity", "reasoning"]
+        }
+        res_text = query_gemini_api(prompt, response_schema=schema)
+        if res_text:
+            try:
+                return json.loads(res_text)
+            except Exception as e:
+                print(f"⚠️ Gemini assess_severity JSON parse failed: {e}")
+
+    # Fallback to local LLM
     global llm
     
     severity_map = {"robbery": 80, "harassment": 60, "accident": 70, "vandalism": 40, "suspicious": 50}
@@ -392,6 +602,7 @@ def assess_severity(description, incident_type):
     return {"severity": 50, "reasoning": "Default"}
 
 
+
 class RequestHandler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(200)
@@ -404,9 +615,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         
         if parsed.path == "/status":
+            has_gemini = GEMINI_API_KEY and GEMINI_API_KEY != 'YOUR_GEMINI_KEY_HERE'
             self.send_json({
                 "status": "ok",
-                "model_loaded": llm is not None,
+                "model_loaded": (llm is not None) or has_gemini,
                 "newsapi_configured": NEWS_API_KEY != "YOUR_API_KEY_HERE"
             })
         elif parsed.path == "/health":
@@ -431,16 +643,16 @@ class RequestHandler(BaseHTTPRequestHandler):
         
         elif parsed.path == "/search_news":
             locations = data.get("locations", [data.get("location", "Nigeria")])
-            print(f"\n🔍 N-ATLaS searching news for: {locations}")
+            print(f"\n[NEWS] searching news for: {locations}")
             result = search_route_news(locations)
-            print(f"✅ Safety Score: {result['safety_score']} (Sources: {result['sources_used']})")
+            print(f"[NEWS] Safety Score: {result['safety_score']} (Sources: {result['sources_used']})")
             self.send_json(result)
         
         elif parsed.path == "/directions":
             # Proxy for Google Directions API to bypass CORS
             origin = data.get("origin", "")
             destination = data.get("destination", "")
-            print(f"\n🗺️ Directions: {origin} → {destination}")
+            print(f"\n[DIRECTIONS] Route request: {origin} -> {destination}")
             result = self.proxy_directions(origin, destination)
             self.send_json(result)
             
@@ -466,14 +678,14 @@ class RequestHandler(BaseHTTPRequestHandler):
                 data = json.loads(response.read().decode("utf-8"))
                 
             if data.get("status") == "OK":
-                print(f"✅ Found {len(data.get('routes', []))} routes")
+                print(f"[DIRECTIONS] Found {len(data.get('routes', []))} routes")
             else:
-                print(f"⚠️ Directions API status: {data.get('status')}")
+                print(f"[WARNING] Directions API status: {data.get('status')}")
             
             return data
             
         except Exception as e:
-            print(f"❌ Directions proxy error: {e}")
+            print(f"[ERROR] Directions proxy error: {e}")
             return {"status": "ERROR", "error_message": str(e)}
     
     def log_message(self, format, *args):
@@ -491,10 +703,10 @@ def main():
         print("WARNING: Running without AI model")
     
     if not NEWS_API_KEY or NEWS_API_KEY == "YOUR_API_KEY_HERE":
-        print("⚠️  NewsAPI key not set - will use scraping/demo")
+        print("[WARNING] NewsAPI key not set - will use scraping/demo")
         print("   Get free key at: https://newsapi.org/register")
     else:
-        print("✅ NewsAPI key configured")
+        print("[INFO] NewsAPI key configured")
     
     server = HTTPServer(("0.0.0.0", port), RequestHandler)
     print(f"\nServer: http://0.0.0.0:{port} (accessible on network)")

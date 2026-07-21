@@ -18,6 +18,7 @@ Widget buildPlatformMap({
   List<latlong2.LatLng>? polylinePoints,
   Color polylineColor = const Color(0xFF39FF14),
   double polylineWidth = 4.0,
+  List<MapPolyline>? polylines,
   Function(latlong2.LatLng)? onTap,
   Function(latlong2.LatLng)? onCameraMove,
   VoidCallback? onCameraIdle,
@@ -35,6 +36,7 @@ Widget buildPlatformMap({
       polylinePoints: polylinePoints,
       polylineColor: polylineColor,
       polylineWidth: polylineWidth,
+      polylines: polylines,
       onMapCreated: onMapCreated,
       onStyleLoaded: onStyleLoaded,
       onTap: onTap,
@@ -54,6 +56,7 @@ Widget buildPlatformMap({
     polylinePoints: polylinePoints,
     polylineColor: polylineColor,
     polylineWidth: polylineWidth,
+    polylines: polylines,
     onMapCreated: onMapCreated,
     onStyleLoaded: onStyleLoaded,
     onTap: onTap,
@@ -72,6 +75,7 @@ Widget _buildGoogleMap({
   List<latlong2.LatLng>? polylinePoints,
   Color polylineColor = const Color(0xFF39FF14),
   double polylineWidth = 4.0,
+  List<MapPolyline>? polylines,
   Function(dynamic controller)? onMapCreated,
   VoidCallback? onStyleLoaded,
   Function(latlong2.LatLng)? onTap,
@@ -79,9 +83,9 @@ Widget _buildGoogleMap({
   VoidCallback? onCameraIdle,
 }) {
   // Build polylines
-  final Set<Polyline> polylines = {};
+  final Set<Polyline> googlePolylines = {};
   if (polylinePoints != null && polylinePoints.isNotEmpty) {
-    polylines.add(Polyline(
+    googlePolylines.add(Polyline(
       polylineId: const PolylineId('route_line'),
       points: polylinePoints.map((p) => LatLng(p.latitude, p.longitude)).toList(),
       color: polylineColor,
@@ -90,6 +94,36 @@ Widget _buildGoogleMap({
       startCap: Cap.roundCap,
       endCap: Cap.roundCap,
     ));
+  }
+
+  // Additional polylines (for connectors, alternative routes, etc.)
+  if (polylines != null) {
+    for (int i = 0; i < polylines.length; i++) {
+      final poly = polylines[i];
+      if (poly.isDashed) {
+        googlePolylines.add(Polyline(
+          polylineId: PolylineId('dashed_$i'),
+          points: poly.points.map((p) => LatLng(p.latitude, p.longitude)).toList(),
+          color: poly.color,
+          width: poly.width.round().clamp(2, 6),
+          patterns: [PatternItem.dash(20), PatternItem.gap(10)],
+          jointType: JointType.round,
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap,
+        ));
+      } else {
+        googlePolylines.add(Polyline(
+          polylineId: PolylineId('solid_$i'),
+          points: poly.points.map((p) => LatLng(p.latitude, p.longitude)).toList(),
+          color: poly.color,
+          width: poly.width.round().clamp(3, 8),
+          jointType: JointType.round,
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap,
+          geodesic: true,
+        ));
+      }
+    }
   }
 
   // Build markers
@@ -116,7 +150,7 @@ Widget _buildGoogleMap({
         circleId: CircleId('circle_$i'),
         center: LatLng(c.center.latitude, c.center.longitude),
         radius: c.radius,
-        fillColor: c.color.withOpacity(c.opacity),
+        fillColor: c.color.withValues(alpha: c.opacity),
         strokeColor: c.color,
         strokeWidth: 2,
       ));
@@ -129,7 +163,7 @@ Widget _buildGoogleMap({
       zoom: zoom,
     ),
     minMaxZoomPreference: MinMaxZoomPreference(minZoom, maxZoom),
-    polylines: polylines,
+    polylines: googlePolylines,
     markers: googleMarkers,
     circles: googleCircles,
     mapType: MapType.normal,
@@ -174,6 +208,7 @@ Widget _buildFlutterMapFallback({
   List<latlong2.LatLng>? polylinePoints,
   Color polylineColor = const Color(0xFF39FF14),
   double polylineWidth = 4.0,
+  List<MapPolyline>? polylines,
   Function(dynamic controller)? onMapCreated,
   VoidCallback? onStyleLoaded,
   Function(latlong2.LatLng)? onTap,
@@ -195,6 +230,7 @@ Widget _buildFlutterMapFallback({
         polylinePoints: polylinePoints,
         polylineColor: polylineColor,
         polylineWidth: polylineWidth,
+        polylines: polylines,
         onMapCreated: onMapCreated,
         onStyleLoaded: onStyleLoaded,
       );
@@ -212,6 +248,7 @@ class _FlutterMapDesktop extends StatelessWidget {
   final List<latlong2.LatLng>? polylinePoints;
   final Color polylineColor;
   final double polylineWidth;
+  final List<MapPolyline>? polylines;
   final Function(dynamic controller)? onMapCreated;
   final VoidCallback? onStyleLoaded;
 
@@ -225,6 +262,7 @@ class _FlutterMapDesktop extends StatelessWidget {
     this.polylinePoints,
     this.polylineColor = const Color(0xFF39FF14),
     this.polylineWidth = 4.0,
+    this.polylines,
     this.onMapCreated,
     this.onStyleLoaded,
   });

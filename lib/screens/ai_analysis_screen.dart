@@ -62,6 +62,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
         _isAnalyzing = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isAnalyzing = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Analysis error: $e')),
@@ -86,6 +87,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
         _isAnalyzing = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isAnalyzing = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Analysis error: $e')),
@@ -158,7 +160,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: AppTheme.backgroundDark,
-        border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.1))),
+        border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
       ),
       child: Row(
         children: [
@@ -170,7 +172,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppTheme.neonGreen.withOpacity(0.2),
+              color: AppTheme.neonGreen.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.auto_awesome, color: AppTheme.neonGreen, size: 24),
@@ -208,9 +210,9 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.1),
+        color: statusColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: statusColor.withOpacity(0.3)),
+        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -218,7 +220,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.2),
+              color: statusColor.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -267,7 +269,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
               decoration: BoxDecoration(
                 color: _selectedTab == 'text'
                     ? AppTheme.neonGreen
-                    : Colors.white.withOpacity(0.05),
+                    : Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -300,7 +302,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
               decoration: BoxDecoration(
                 color: _selectedTab == 'url'
                     ? AppTheme.neonGreen
-                    : Colors.white.withOpacity(0.05),
+                    : Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -343,7 +345,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             hintText: 'Paste news article, social media post, or any text...',
             hintStyle: TextStyle(color: Colors.grey[600]),
             border: OutlineInputBorder(
@@ -374,7 +376,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             hintText: 'https://news.example.com/article...',
             hintStyle: TextStyle(color: Colors.grey[600]),
             prefixIcon: const Icon(Icons.link, color: AppTheme.accentBlue),
@@ -406,7 +408,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.neonGreen.withOpacity(0.2),
+                  color: AppTheme.neonGreen.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.analytics, color: AppTheme.neonGreen),
@@ -467,7 +469,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
                   const SizedBox(height: 8),
                   LinearProgressIndicator(
                     value: result.severity,
-                    backgroundColor: Colors.white.withOpacity(0.1),
+                    backgroundColor: Colors.white.withValues(alpha: 0.1),
                     valueColor: AlwaysStoppedAnimation(
                       result.severity > 0.7 ? Colors.red : 
                       result.severity > 0.4 ? Colors.orange : 
@@ -495,7 +497,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
                   const SizedBox(height: 8),
                   LinearProgressIndicator(
                     value: result.confidence,
-                    backgroundColor: Colors.white.withOpacity(0.1),
+                    backgroundColor: Colors.white.withValues(alpha: 0.1),
                     valueColor: const AlwaysStoppedAnimation(AppTheme.accentBlue),
                   ),
                 ],
@@ -507,7 +509,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -540,7 +542,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(
-            color: valueColor.withOpacity(0.2),
+            color: valueColor.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
@@ -589,7 +591,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.white10),
               ),

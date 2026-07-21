@@ -71,3 +71,7 @@ lib/config/api_config.dart
 # OS
 .DS_Store
 Thumbs.db
+
+# Analysis logs
+analyze_*.txt
+

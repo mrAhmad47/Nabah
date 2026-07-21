@@ -59,7 +59,7 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
             _incidents.map((i) => i.location.latitude).reduce((a, b) => a + b) / _incidents.length,
             _incidents.map((i) => i.location.longitude).reduce((a, b) => a + b) / _incidents.length,
           )
-        : latlong2.LatLng(6.5244, 3.3792); // Default Lagos
+        : const latlong2.LatLng(6.5244, 3.3792); // Default Lagos
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundDark,
@@ -90,7 +90,7 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
                               border: Border.all(color: Colors.white, width: 3),
                               boxShadow: [
                                 BoxShadow(
-                                  color: _getSeverityColor(incident.severity).withOpacity(0.6),
+                                  color: _getSeverityColor(incident.severity).withValues(alpha: 0.6),
                                   blurRadius: 15,
                                   spreadRadius: 3,
                                 ),
@@ -125,7 +125,7 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withOpacity(0.8),
+                      Colors.black.withValues(alpha: 0.8),
                       Colors.transparent,
                     ],
                   ),
@@ -143,14 +143,14 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppTheme.neonGreen.withOpacity(0.2),
+                        color: AppTheme.neonGreen.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: AppTheme.neonGreen),
                       ),
-                      child: Row(
+                      child: const Row(
                         children: [
-                          const Icon(Icons.access_time, color: AppTheme.neonGreen, size: 16),
-                          const SizedBox(width: 4),
+                          Icon(Icons.access_time, color: AppTheme.neonGreen, size: 16),
+                          SizedBox(width: 4),
                           Text(
                             'Last 24h',
                             style: TextStyle(
@@ -182,14 +182,14 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.backgroundDark.withOpacity(0.95),
+                  color: AppTheme.backgroundDark.withValues(alpha: 0.95),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: _getSeverityColor(_selectedIncident!.severity).withOpacity(0.5),
+                    color: _getSeverityColor(_selectedIncident!.severity).withValues(alpha: 0.5),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.5),
+                      color: Colors.black.withValues(alpha: 0.5),
                       blurRadius: 20,
                     ),
                   ],
@@ -203,7 +203,7 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: _getSeverityColor(_selectedIncident!.severity).withOpacity(0.2),
+                            color: _getSeverityColor(_selectedIncident!.severity).withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(
@@ -279,7 +279,7 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
                 decoration: BoxDecoration(
                   color: Colors.black87,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppTheme.neonGreen.withOpacity(0.5)),
+                  border: Border.all(color: AppTheme.neonGreen.withValues(alpha: 0.5)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

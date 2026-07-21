@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart' as latlong2;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import '../config/api_config.dart';
 
 /// Google Directions Service with Fallback
 /// 
@@ -83,11 +83,7 @@ class DirectionsService {
     
     // Use proxy server to bypass CORS on web
     try {
-      // Auto-detect platform: localhost for web, WiFi IP for mobile
-      final proxyUrl = kIsWeb 
-          ? 'http://127.0.0.1:8765/directions'
-          : 'http://10.227.22.98:8765/directions';
-      
+      final proxyUrl = '${ApiConfig.natlasServerUrl}/directions';
       debugPrint('🗺️ Fetching directions via proxy: $originQuery -> $destQuery');
       final response = await http.post(
         Uri.parse(proxyUrl),
