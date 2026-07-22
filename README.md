@@ -1,29 +1,26 @@
-# RouteGuardian 🛡️
+# Nebah 🛡️ — AI-Powered Community Safety Ecosystem
 
-**AI-Powered Safety Routing App for Nigeria and Africa**
+**The Comprehensive AI-Powered Safety Platform for Nigeria and Africa**
 
-A Flutter application that helps users find the safest routes by analyzing real-time incidents, news reports, and user submissions using AI-powered risk assessment.
+Nebah is a modular, AI-powered community safety platform. **Route Guardian** is the personal travel safety module inside Nebah.
 
-## 🌟 Features
+## 🌟 Core Modules & Architecture
 
-### ✅ Implemented & Working
+- **Home Dashboard**: Real-time safety score, active alerts, AI recommendations, and quick shortcuts.
+- **Route Guardian (Travel Safety)**: Safe route planning with AI hazard avoidance, travel safety scores, and route polylines.
+- **Community Hierarchy & Watch**: Traditional 4-tier community governance mapping from *Sub-Neighbourhood (Mai Anguwa)* to *District (Sarkin District)*, *LGA*, and *State Command*.
+- **Vigilante & Local Security Digital ID Cards**: Digital ID badges with QR verification for neighbourhood patrol officers.
+- **Dual SOS System**: 
+  - **Hardware Button SOS (Stealth Panic)**: Instant zero-tap broadcast to emergency contacts, local vigilantes, and police.
+  - **In-App Categorised SOS**: Interactive modal for specific emergency categories (Intruders, Medical, Fire, Accident, Suspicious Activity).
+- **Safety Map (GIS)**: Unified interactive map with crime heatmaps, emergency services, and community incident pins.
+- **Nebah AI Assistant**: Gemini API-powered context-aware safety assistant.
 
-- **Safe Route Navigation**: Find multiple route alternatives with AI-powered safety scoring
-- **Real-time Incident Map**: Interactive explore map showing crime, accidents, and security incidents
-- **News Discovery**: Automatic incident detection from Nigeria news sources (last 24 hours)
-- **Heatmap Visualization**: 500m radius circles showing incident severity
-- **User Reports**: Community-driven incident reporting system
-- **N-ATLaS AI Analysis**: Local AI model for safety assessment and severity scoring
-- **Platform Auto-Detection**: Seamlessly works on web and mobile
+## 🎨 Design System
 
-## 🎯 Key Highlights
+- **Theme**: Modern Security-Tech aesthetic with full **Light Mode** and **Dark Mode** support.
+- **Typography**: Inter font family for crisp legibility.
 
-- **Local-First Architecture**: No backend required - runs completely locally
-- **No Firebase Dependency**: Authentication is mocked for local development
-- **200+ Point Route Polylines**: Routes follow roads accurately with smooth curves
-- **24-Hour Incident Filter**: Only shows recent, relevant safety information
-- **Offline Routing**: Fallback routing when server unavailable
-- **Cross-Platform**: Web (Chrome) and Mobile (Android/iOS) support
 
 ## 🚀 Getting Started
 

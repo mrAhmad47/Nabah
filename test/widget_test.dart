@@ -10,7 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-import 'package:route_guardian/main.dart';
+import 'package:nebah/main.dart';
 
 class MockHttpOverrides extends HttpOverrides {
   @override
@@ -109,7 +109,7 @@ void main() {
   });
 
   testWidgets('App launches without errors', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const NebahApp());
 
     // Verify the app title or main screen renders
     expect(find.byType(MaterialApp), findsOneWidget);

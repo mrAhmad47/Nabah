@@ -618,11 +618,90 @@ class RequestHandler(BaseHTTPRequestHandler):
             has_gemini = GEMINI_API_KEY and GEMINI_API_KEY != 'YOUR_GEMINI_KEY_HERE'
             self.send_json({
                 "status": "ok",
+                "app": "Nebah — AI Safety Ecosystem",
                 "model_loaded": (llm is not None) or has_gemini,
                 "newsapi_configured": NEWS_API_KEY != "YOUR_API_KEY_HERE"
             })
         elif parsed.path == "/health":
             self.send_json({"healthy": True})
+        elif parsed.path in ["/api/v1/community/hierarchy", "/community/hierarchy"]:
+            self.send_json([
+                {
+                    "id": "node_tier1_01",
+                    "name": "Sarkin Yama Quarter",
+                    "level": 1,
+                    "parent_id": "node_tier2_01",
+                    "leader_name": "Mallam Usman Danlami",
+                    "leader_role": "Mai Anguwa (Sub-Neighbourhood Leader)",
+                    "is_verified_leader": True,
+                    "location_address": "Gwallameji West, Bauchi",
+                    "member_count": 1420,
+                    "active_vigilantes_count": 18
+                },
+                {
+                    "id": "node_tier2_01",
+                    "name": "Gwallameji / Yelwa District",
+                    "level": 2,
+                    "parent_id": "node_tier3_01",
+                    "leader_name": "Alhaji Ibrahim Gwallameji",
+                    "leader_role": "Sarkin District (District Head)",
+                    "is_verified_leader": True,
+                    "location_address": "Yelwa District, Bauchi State",
+                    "member_count": 12500,
+                    "active_vigilantes_count": 64
+                },
+                {
+                    "id": "node_tier3_01",
+                    "name": "Bauchi Metropolitan LGA",
+                    "level": 3,
+                    "parent_id": "node_tier4_01",
+                    "leader_name": "Hon. Community Chairman",
+                    "leader_role": "LGA Security & Administrative Command",
+                    "is_verified_leader": True,
+                    "location_address": "Bauchi LGA Headquarters",
+                    "member_count": 185000,
+                    "active_vigilantes_count": 420
+                },
+                {
+                    "id": "node_tier4_01",
+                    "name": "Bauchi State Security Command",
+                    "level": 4,
+                    "leader_name": "State Security Council",
+                    "leader_role": "State Command & Emergency Agency (SEMA)",
+                    "is_verified_leader": True,
+                    "location_address": "State Secretariat, Bauchi",
+                    "member_count": 2400000,
+                    "active_vigilantes_count": 3500
+                }
+            ])
+        elif parsed.path in ["/api/v1/community/announcements", "/community/announcements"]:
+            self.send_json([
+                {
+                    "id": "ann_01",
+                    "community_id": "node_tier1_01",
+                    "community_name": "Sarkin Yama Quarter",
+                    "author_name": "Mallam Usman Danlami",
+                    "author_role": "Mai Anguwa (Leader)",
+                    "title": "🔒 Enhanced Night Patrol & Curfew Advisory",
+                    "content": "Peace be unto you. Following security reports near Federal Low-Cost gate, our neighborhood vigilante squad has doubled night patrols between 11:00 PM and 5:00 AM.",
+                    "priority": "urgent",
+                    "created_at": datetime.now().isoformat(),
+                    "is_pinned": True
+                }
+            ])
+        elif parsed.path in ["/api/v1/community/vigilantes/me", "/community/vigilantes/me"]:
+            self.send_json({
+                "id": "vig_mem_901",
+                "group_id": "vig_grp_10",
+                "group_name": "Sarkin Yama Neighbourhood Watch Squad",
+                "community_name": "Sarkin Yama Quarter (Mai Anguwa)",
+                "member_name": "Commander Kabir Abubakar",
+                "badge_number": "NEB-VIG-2026-084",
+                "rank_title": "Chief Patrol Commander",
+                "qr_data": "NEBAH-VERIFIED-VIGILANTE|NEB-VIG-2026-084|KABIR_ABUBAKAR|MAI_ANGUWA_YAMA",
+                "is_patrol_active": True,
+                "issued_at": DateTime.now().isoformat() if 'DateTime' in globals() else datetime.now().isoformat()
+            })
         else:
             self.send_error(404)
     
@@ -632,8 +711,17 @@ class RequestHandler(BaseHTTPRequestHandler):
         data = json.loads(body) if body else {}
         
         parsed = urlparse(self.path)
-        
-        if parsed.path == "/analyze":
+
+        if parsed.path in ["/api/v1/emergency/sos/panic", "/api/v1/emergency/sos/categorized"]:
+            print(f"\n🚨 [NEBAH SOS DISPATCH] Mode: {parsed.path} | Target: {data.get('category', 'PANIC')}")
+            print(f"   User: {data.get('user_name')} ({data.get('user_phone')}) at ({data.get('latitude')}, {data.get('longitude')})")
+            self.send_json({
+                "status": "DISPATCHED",
+                "message": "Emergency notification broadcasted to local vigilante, police, and emergency contacts.",
+                "sos_id": data.get("id", f"sos_{int(datetime.now().timestamp())}")
+            })
+
+        elif parsed.path == "/analyze":
             result = analyze_text(data.get("text", ""))
             self.send_json(result)
             

@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
+import '../services/community_service.dart';
+import '../services/journey_service.dart';
+import '../services/missing_persons_service.dart';
+import '../services/sos_service.dart';
 import '../theme/theme.dart';
+import 'admin/government_dashboard_screen.dart';
+import 'community/missing_persons_screen.dart';
+import 'emergency/quick_tile_sos_screen.dart';
+import 'journey/active_journey_screen.dart';
+import 'subscription/paystack_subscription_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -13,6 +22,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _darkModeEnabled = true;
   bool _locationSharing = true;
   bool _anonymousReporting = false;
+
+  late final JourneyService _journeyService = JourneyService();
+  late final MissingPersonsService _mpService = MissingPersonsService();
+  late final CommunityService _communityService = CommunityService();
+  late final SosService _sosService = SosService();
+
+  @override
+  void dispose() {
+    _journeyService.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +82,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ]),
                     
                     const SizedBox(height: 24),
+                    _buildSectionTitle('NEBAH V2 SAFETY TOOLS'),
+                    const SizedBox(height: 12),
+                    _buildSettingsCard([
+                      _buildSettingItem(
+                        icon: Icons.alt_route,
+                        title: 'Live Journey Guardian',
+                        subtitle: 'Monitored trip progress & ETA auto-alerts',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => ActiveJourneyScreen(journeyService: _journeyService),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildSettingItem(
+                        icon: Icons.person_search_outlined,
+                        title: 'Missing Persons Noticeboard',
+                        subtitle: 'Community search board & report filing',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => MissingPersonsScreen(service: _mpService),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildSettingItem(
+                        icon: Icons.workspace_premium,
+                        title: 'Nebah Shield Premium (Paystack)',
+                        subtitle: 'Hardware panic & B2B security tiers',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const PaystackSubscriptionScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildSettingItem(
+                        icon: Icons.widgets_outlined,
+                        title: 'Quick Tile & Widget SOS',
+                        subtitle: 'Configure zero-tap phone panic buttons',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => QuickTileSosScreen(sosService: _sosService),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildSettingItem(
+                        icon: Icons.admin_panel_settings_outlined,
+                        title: 'Leader Command Portal',
+                        subtitle: 'Mai Anguwa & Traditional Council portal',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => GovernmentDashboardScreen(communityService: _communityService),
+                            ),
+                          );
+                        },
+                      ),
+                    ]),
                     _buildSectionTitle('PREFERENCES'),
                     const SizedBox(height: 12),
                     _buildSettingsCard([
