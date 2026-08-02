@@ -33,6 +33,10 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
   bool _routeCalculated = false;
   bool _isInputExpanded = true; // Toggle for input panel
   bool _isAnalyzingRoutes = false;
+  // ignore: prefer_final_fields
+  TransportMode _selectedMode = TransportMode.driving;
+  // ignore: prefer_final_fields
+  bool _avoidCheckpoints = false;
   
   // Intersection state
   List<RouteIntersection> _intersections = [];
@@ -70,6 +74,8 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
       final routes = await _directionsService.getMultipleRoutes(
         origin: fromText,
         destination: toText,
+        mode: _selectedMode,
+        avoidCheckpoints: _avoidCheckpoints,
       );
 
       if (routes.isEmpty) {

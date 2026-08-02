@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/nebah_colors.dart';
 import '../../models/missing_person.dart';
@@ -289,6 +290,17 @@ class _MissingPersonsScreenState extends State<MissingPersonsScreen> {
                           ),
                           Row(
                             children: [
+                              IconButton(
+                                icon: const Icon(Icons.share, color: NebahColors.cobaltBlue),
+                                onPressed: () {
+                                  final message = "🚨 MISSING PERSON ALERT\n\n"
+                                      "Name: ${item.fullName} (${item.age} yrs)\n"
+                                      "Last seen: ${item.lastSeenLocation}\n"
+                                      "Contact: ${item.emergencyContactName} (${item.emergencyContactPhone})\n\n"
+                                      "If seen, please call immediately.";
+                                  Share.share(message);
+                                },
+                              ),
                               IconButton(
                                 icon: const Icon(Icons.phone, color: NebahColors.safetyEmerald),
                                 onPressed: () async {

@@ -3,7 +3,14 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!-- Background location — required for geofencing when app is closed -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Activity recognition — required by geofence_service for accurate zone detection -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
     
     <application
         android:label="RouteGuardian"
@@ -13,7 +20,7 @@
         <!-- Google Maps API Key - REQUIRED for maps to work -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDLgxgrNJq-4xjRi_cc9RPvX-kKC06VwyQ"/>
+            android:value="AIzaSyAC4hOGqFDgbsZZjXGamzK4mWa8YBTP8dk"/>
         
         <activity
             android:name=".MainActivity"

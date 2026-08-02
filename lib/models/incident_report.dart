@@ -10,6 +10,7 @@ class IncidentReport {
   final int severity; // 1-100, where 100 is most severe
   final String source; // 'user' or 'news' or 'ai'
   final bool verified;
+  final bool isAnonymous;
 
   IncidentReport({
     required this.id,
@@ -21,6 +22,7 @@ class IncidentReport {
     required this.severity,
     this.source = 'user',
     this.verified = false,
+    this.isAnonymous = false,
   });
 
   // Convert to Map for database storage

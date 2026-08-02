@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/theme/nebah_colors.dart';
 
 class PaystackSubscriptionScreen extends StatefulWidget {
@@ -47,6 +48,21 @@ class _PaystackSubscriptionScreenState extends State<PaystackSubscriptionScreen>
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('nebah_is_subscribed', true);
       await prefs.setString('nebah_selected_plan', _selectedPlan);
+
+      // Update Supabase profile
+      try {
+        final user = Supabase.instance.client.auth.currentUser;
+        if (user != null) {
+          await Supabase.instance.client.from('profiles').update({
+            'is_subscribed': true,
+            'subscription_plan': _selectedPlan,
+            'updated_at': DateTime.now().toIso8601String(),
+          }).eq('id', user.id);
+          debugPrint('⚡ Subscription plan updated in Supabase cloud DB!');
+        }
+      } catch (e) {
+        debugPrint('⚠️ Error updating subscription status in Supabase: $e');
+      }
 
       if (mounted) {
         setState(() {

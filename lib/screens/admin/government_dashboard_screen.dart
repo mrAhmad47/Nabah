@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/theme/nebah_colors.dart';
 import '../../models/community_hierarchy.dart';
 import '../../services/community_service.dart';
@@ -179,6 +180,24 @@ class _GovernmentDashboardScreenState extends State<GovernmentDashboardScreen> {
                               createdAt: DateTime.now(),
                             );
                             await widget.communityService.postAnnouncement(ann);
+
+                            // Insert into Supabase cloud DB
+                            try {
+                              await Supabase.instance.client.from('announcements').insert({
+                                'id': ann.id,
+                                'community_id': ann.communityId,
+                                'author_name': ann.authorName,
+                                'author_role': ann.authorRole,
+                                'title': ann.title,
+                                'content': ann.content,
+                                'priority': ann.priority,
+                                'created_at': ann.createdAt.toIso8601String(),
+                              });
+                              debugPrint('⚡ Broadcast advisory inserted into Supabase cloud DB!');
+                            } catch (e) {
+                              debugPrint('⚠️ Supabase announcement insert error: $e');
+                            }
+
                             _annTitleController.clear();
                             _annContentController.clear();
 

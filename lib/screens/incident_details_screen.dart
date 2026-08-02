@@ -134,7 +134,7 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
                                   Icon(Icons.verified, size: 16, color: AppTheme.accentBlue),
                                   SizedBox(width: 4),
                                   Text(
-                                    'N-ATLaS Verified', // Updated branding
+                                    'Nebah AI Verified',
                                     style: TextStyle(
                                       color: AppTheme.accentBlue,
                                       fontWeight: FontWeight.bold,
@@ -201,7 +201,7 @@ class _IncidentDetailsScreenState extends State<IncidentDetailsScreen> {
                          Row(
                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                            children: [
-                             const Text("N-ATLaS AI Analysis", style: TextStyle(color: AppTheme.accentBlue, fontWeight: FontWeight.bold)),
+                             const Text("Nebah AI Safety Analysis", style: TextStyle(color: AppTheme.accentBlue, fontWeight: FontWeight.bold)),
                              if (_isAnalyzing)
                                const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.accentBlue)),
                            ],

@@ -50,5 +50,7 @@ class NebahColors {
   static const Color safetyEmerald = Color(0xFF057A55);
   static const Color crimsonRed = Color(0xFFE02424);
   static const Color navyBackground = Color(0xFF0F172A);
+  static const Color slate900 = Color(0xFF0F172A);
+  static const Color slate800 = Color(0xFF1E293B);
   static const Color slateGrey = Color(0xFF94A3B8);
 }

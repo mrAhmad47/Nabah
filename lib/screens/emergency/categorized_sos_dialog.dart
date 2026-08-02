@@ -338,14 +338,21 @@ class _CategorizedSosDialogState extends State<CategorizedSosDialog> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.campaign, size: 28),
-                const SizedBox(width: 10),
-                Text(
-                  'DISPATCH ${_selectedCategory.title.toUpperCase()}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.0,
+                const Icon(Icons.campaign, size: 26),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      'DISPATCH ${_selectedCategory.title.toUpperCase()}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -355,6 +362,7 @@ class _CategorizedSosDialogState extends State<CategorizedSosDialog> {
       ],
     );
   }
+
 
   /// Countdown cancel safety view
   Widget _buildCountdownView(bool isDark) {

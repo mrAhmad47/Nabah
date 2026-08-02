@@ -74,42 +74,47 @@ class _VigilanteIdScreenState extends State<VigilanteIdScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 12,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                color: _isPatrolActive
-                                    ? NebahColors.safetyEmerald
-                                    : NebahColors.slateGrey,
-                                shape: BoxShape.circle,
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: _isPatrolActive
+                                      ? NebahColors.safetyEmerald
+                                      : NebahColors.slateGrey,
+                                  shape: BoxShape.circle,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _isPatrolActive ? 'ACTIVE ON PATROL' : 'OFF DUTY',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: isDark ? Colors.white : NebahColors.deepNavy,
-                                  ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _isPatrolActive ? 'ACTIVE ON PATROL' : 'OFF DUTY',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: isDark ? Colors.white : NebahColors.deepNavy,
+                                      ),
+                                    ),
+                                    Text(
+                                      _isPatrolActive
+                                          ? 'Receiving neighbourhood SOS dispatches'
+                                          : 'Patrol alerts paused',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: isDark ? NebahColors.slateGrey : Colors.black54,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  _isPatrolActive
-                                      ? 'Receiving neighbourhood SOS dispatches'
-                                      : 'Patrol alerts paused',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDark ? NebahColors.slateGrey : Colors.black54,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
                         Switch.adaptive(
                           value: _isPatrolActive,

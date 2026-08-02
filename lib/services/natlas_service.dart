@@ -3,9 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 
-/// N-ATLaS AI Service for incident analysis and news processing
+/// Nebah AI Service for incident analysis and news processing
 /// 
-/// This service communicates with the Python N-ATLaS server
+/// This service communicates with the Nebah AI backend server
 /// for real AI-powered analysis.
 class NAtlasService {
   static final NAtlasService instance = NAtlasService._init();
@@ -17,7 +17,7 @@ class NAtlasService {
   
   NAtlasService._init();
 
-  /// Check if the N-ATLaS model file exists
+  /// Check if the Nebah AI model file exists
   Future<bool> isModelAvailable() async {
     // On web, we can't check local files — just check if server is responding
     if (kIsWeb) {
@@ -48,7 +48,7 @@ class NAtlasService {
     }
     
     try {
-      debugPrint('Starting N-ATLaS server...');
+      debugPrint('Starting Nebah AI server...');
       // On non-web platforms, attempt to start the server process
       // Note: Process requires dart:io which is not available on web
       debugPrint('⚠️ Please start the server manually: python natlas_server.py');

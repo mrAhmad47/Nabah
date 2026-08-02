@@ -5,11 +5,9 @@ import '../services/onboarding_service.dart';
 import '../services/sos_service.dart';
 import 'community/community_hierarchy_screen.dart';
 import 'emergency/categorized_sos_dialog.dart';
-import 'emergency/emergency_hub_screen.dart';
 import 'home_map_screen.dart';
 import 'onboarding/onboarding_screen.dart';
 import 'premium_map_screen.dart';
-import 'profile_screen.dart';
 import 'route_selection_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -71,8 +69,6 @@ class _MainScreenState extends State<MainScreen> {
       const RouteSelectionScreen(),
       CommunityHierarchyScreen(communityService: _communityService),
       const PremiumMapScreen(),
-      EmergencyHubScreen(sosService: _sosService),
-      const ProfileScreen(),
     ];
 
     return Scaffold(
@@ -101,7 +97,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
 
-      // Docked Navigation Bar
+      // Docked Navigation Bar (4 Core Tabs surrounding SOS FAB)
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 6.0,
@@ -111,10 +107,10 @@ class _MainScreenState extends State<MainScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              // Home Tab
+              // 1. Home Tab
               IconButton(
                 icon: Icon(
-                  Icons.home_outlined,
+                  _selectedIndex == 0 ? Icons.home : Icons.home_outlined,
                   color: _selectedIndex == 0
                       ? NebahColors.cobaltBlue
                       : (isDark ? NebahColors.slateGrey : Colors.black54),
@@ -123,7 +119,7 @@ class _MainScreenState extends State<MainScreen> {
                 onPressed: () => _onItemTapped(0),
               ),
 
-              // Route Guardian Safe Trip Tab
+              // 2. Route Guardian Navigation Tab
               IconButton(
                 icon: Icon(
                   Icons.alt_route,
@@ -135,55 +131,31 @@ class _MainScreenState extends State<MainScreen> {
                 onPressed: () => _onItemTapped(1),
               ),
 
-              // Community Hierarchy Tab
+              // Center Space for SOS FAB
+              const SizedBox(width: 48),
+
+              // 3. Community Tab
               IconButton(
                 icon: Icon(
-                  Icons.account_tree_outlined,
+                  _selectedIndex == 2 ? Icons.groups : Icons.groups_outlined,
                   color: _selectedIndex == 2
                       ? NebahColors.cobaltBlue
                       : (isDark ? NebahColors.slateGrey : Colors.black54),
                 ),
-                tooltip: 'Community Hierarchy',
+                tooltip: 'Community',
                 onPressed: () => _onItemTapped(2),
               ),
 
-              // Center Space for SOS FAB
-              const SizedBox(width: 44),
-
-              // Safety Map Tab
+              // 4. Safety Map Tab
               IconButton(
                 icon: Icon(
-                  Icons.map_outlined,
+                  _selectedIndex == 3 ? Icons.map : Icons.map_outlined,
                   color: _selectedIndex == 3
                       ? NebahColors.cobaltBlue
                       : (isDark ? NebahColors.slateGrey : Colors.black54),
                 ),
                 tooltip: 'Safety Map',
                 onPressed: () => _onItemTapped(3),
-              ),
-
-              // Emergency Hub Tab
-              IconButton(
-                icon: Icon(
-                  Icons.warning_amber_rounded,
-                  color: _selectedIndex == 4
-                      ? NebahColors.crimsonRed
-                      : (isDark ? NebahColors.slateGrey : Colors.black54),
-                ),
-                tooltip: 'Emergency Hub',
-                onPressed: () => _onItemTapped(4),
-              ),
-
-              // Profile Tab
-              IconButton(
-                icon: Icon(
-                  Icons.person_outline,
-                  color: _selectedIndex == 5
-                      ? NebahColors.cobaltBlue
-                      : (isDark ? NebahColors.slateGrey : Colors.black54),
-                ),
-                tooltip: 'Profile',
-                onPressed: () => _onItemTapped(5),
               ),
             ],
           ),

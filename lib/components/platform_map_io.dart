@@ -11,6 +11,7 @@ Widget buildPlatformMap({
   double minZoom = 3.0,
   double maxZoom = 18.0,
   String? styleUrl,
+  MapTypeMode mapType = MapTypeMode.hybrid,
   Function(dynamic controller)? onMapCreated,
   VoidCallback? onStyleLoaded,
   List<MapCircle>? circles,
@@ -51,6 +52,7 @@ Widget buildPlatformMap({
     zoom: zoom,
     minZoom: minZoom,
     maxZoom: maxZoom,
+    mapType: mapType,
     circles: circles,
     markers: markers,
     polylinePoints: polylinePoints,
@@ -65,11 +67,25 @@ Widget buildPlatformMap({
   );
 }
 
+MapType _toMapType(MapTypeMode mode) {
+  switch (mode) {
+    case MapTypeMode.hybrid:
+      return MapType.hybrid;
+    case MapTypeMode.satellite:
+      return MapType.satellite;
+    case MapTypeMode.normal:
+      return MapType.normal;
+    case MapTypeMode.terrain:
+      return MapType.terrain;
+  }
+}
+
 Widget _buildGoogleMap({
   required latlong2.LatLng center,
   required double zoom,
   required double minZoom,
   required double maxZoom,
+  MapTypeMode mapType = MapTypeMode.hybrid,
   List<MapCircle>? circles,
   List<MapMarker>? markers,
   List<latlong2.LatLng>? polylinePoints,
@@ -166,7 +182,7 @@ Widget _buildGoogleMap({
     polylines: googlePolylines,
     markers: googleMarkers,
     circles: googleCircles,
-    mapType: MapType.normal,
+    mapType: _toMapType(mapType),
     myLocationEnabled: false,
     myLocationButtonEnabled: false,
     zoomControlsEnabled: true,

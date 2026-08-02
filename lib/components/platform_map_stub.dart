@@ -9,6 +9,7 @@ Widget buildPlatformMap({
   double minZoom = 3.0,
   double maxZoom = 18.0,
   String? styleUrl,
+  MapTypeMode mapType = MapTypeMode.hybrid,
   Function(dynamic controller)? onMapCreated,
   VoidCallback? onStyleLoaded,
   List<MapCircle>? circles,

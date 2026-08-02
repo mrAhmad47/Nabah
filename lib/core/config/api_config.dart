@@ -14,14 +14,33 @@ class ApiConfig {
     return envUrl;
   }
 
-  // N-ATLaS Inference Server URL (Fallback local python server)
+  // Nebah AI Inference Server URL
   static String get natlasServerUrl {
     return dotenv.env['NATLAS_SERVER_URL'] ?? 'http://10.0.2.2:8765';
   }
 
-  // Gemini AI Key
+  // Supabase Cloud Configuration
+  static String get supabaseUrl =>
+      dotenv.env['SUPABASE_URL'] ?? 'https://jyuayofkakbbdlzsctbe.supabase.co';
+
+  static String get supabaseAnonKey =>
+      dotenv.env['SUPABASE_ANON_KEY'] ?? '';
+
+  // Gemini AI Key & Capability Chain
   static String get geminiApiKey =>
       dotenv.env['GEMINI_API_KEY'] ?? '';
+
+  static String get geminiPrimaryModel =>
+      dotenv.env['GEMINI_MODEL_PRIMARY'] ?? 'gemini-2.5-flash';
+
+  static String get geminiSecondaryModel =>
+      dotenv.env['GEMINI_MODEL_SECONDARY'] ?? 'gemini-3.1-flash-lite';
+
+  static String get geminiTertiaryModel =>
+      dotenv.env['GEMINI_MODEL_TERTIARY'] ?? 'gemini-2.5-flash-lite';
+
+  static String get geminiFallbackModel =>
+      dotenv.env['GEMINI_MODEL_FALLBACK'] ?? 'gemini-2.0-flash-lite';
 
   // Google Maps API Key
   static String get googleMapsApiKey =>

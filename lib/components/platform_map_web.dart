@@ -10,6 +10,7 @@ Widget buildPlatformMap({
   double minZoom = 3.0,
   double maxZoom = 18.0,
   String? styleUrl,
+  MapTypeMode mapType = MapTypeMode.hybrid,
   Function(dynamic controller)? onMapCreated,
   VoidCallback? onStyleLoaded,
   List<MapCircle>? circles,
@@ -23,11 +24,12 @@ Widget buildPlatformMap({
   VoidCallback? onCameraIdle,
 }) {
   return _GoogleMapWithPolyline(
-    key: ValueKey(polylinePoints?.length ?? 0),
+    key: ValueKey('${polylinePoints?.length ?? 0}_${mapType.name}'),
     center: center,
     zoom: zoom,
     minZoom: minZoom,
     maxZoom: maxZoom,
+    mapType: mapType,
     circles: circles,
     markers: markers,
     polylinePoints: polylinePoints,
@@ -42,11 +44,25 @@ Widget buildPlatformMap({
   );
 }
 
+MapType _toMapType(MapTypeMode mode) {
+  switch (mode) {
+    case MapTypeMode.hybrid:
+      return MapType.hybrid;
+    case MapTypeMode.satellite:
+      return MapType.satellite;
+    case MapTypeMode.normal:
+      return MapType.normal;
+    case MapTypeMode.terrain:
+      return MapType.terrain;
+  }
+}
+
 class _GoogleMapWithPolyline extends StatefulWidget {
   final latlong2.LatLng center;
   final double zoom;
   final double minZoom;
   final double maxZoom;
+  final MapTypeMode mapType;
   final List<MapCircle>? circles;
   final List<MapMarker>? markers;
   final List<latlong2.LatLng>? polylinePoints;
@@ -65,6 +81,7 @@ class _GoogleMapWithPolyline extends StatefulWidget {
     required this.zoom,
     required this.minZoom,
     required this.maxZoom,
+    this.mapType = MapTypeMode.hybrid,
     this.circles,
     this.markers,
     this.polylinePoints,
@@ -199,7 +216,7 @@ class _GoogleMapWithPolylineState extends State<_GoogleMapWithPolyline> {
       polylines: _buildPolylines(),
       markers: _buildMarkers(),
       circles: _buildCircles(),
-      mapType: MapType.normal,
+      mapType: _toMapType(widget.mapType),
       myLocationEnabled: false,
       myLocationButtonEnabled: false,
       zoomControlsEnabled: true,

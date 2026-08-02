@@ -130,7 +130,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
                     
                     // Analyze Button
                     NeonButton(
-                      text: _isAnalyzing ? "Analyzing..." : "Analyze with N-ATLaS",
+                      text: _isAnalyzing ? "Analyzing..." : "Analyze with Nebah AI",
                       isPrimary: true,
                       onPressed: _isAnalyzing
                           ? () {}
@@ -183,7 +183,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'N-ATLaS AI Analysis',
+                  'Nebah AI Safety Analysis',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -191,7 +191,7 @@ class _AIAnalysisScreenState extends State<AIAnalysisScreen> {
                   ),
                 ),
                 Text(
-                  'Powered by N-ATLaS Language Model',
+                  'Powered by Nebah AI Safety Engine',
                   style: TextStyle(color: Colors.grey, fontSize: 12),
                 ),
               ],

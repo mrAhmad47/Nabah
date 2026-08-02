@@ -6,6 +6,7 @@ import 'route_selection_screen.dart';
 import 'alerts_screen.dart';
 import 'report_incident_screen.dart';
 import 'ai_analysis_screen.dart';
+import 'profile_screen.dart';
 import '../services/geolocation_service.dart';
 import '../services/directions_service.dart';
 import '../services/route_safety_news_service.dart';
@@ -158,17 +159,25 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'SafeRoute',
+                    'Nebah',
                     style: AppTheme.titleStyle.copyWith(fontSize: 22, letterSpacing: 1.5),
                   ),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                      );
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.person, color: Colors.white),
                     ),
-                    child: const Icon(Icons.person, color: Colors.white),
                   ),
                 ],
               ),
@@ -377,7 +386,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                             MaterialPageRoute(builder: (context) => const AIAnalysisScreen()),
                           );
                         },
-                        child: _buildShortcutItem(Icons.auto_awesome, 'N-ATLaS AI'),
+                        child: _buildShortcutItem(Icons.auto_awesome, 'Gemini AI'),
                       ),
                     ),
                     const SizedBox(width: 8),

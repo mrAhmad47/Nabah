@@ -425,15 +425,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 24),
+          Text(
+            'Primary Emergency Contact Name',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: isDark ? NebahColors.slateGrey : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 6),
           TextField(
             controller: _contactNameController,
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 15),
             decoration: InputDecoration(
-              labelText: 'Primary Emergency Contact Name',
-              labelStyle: TextStyle(color: isDark ? NebahColors.slateGrey : Colors.black54),
+              hintText: 'e.g. Alhaji Danladi (Father)',
+              hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.black38),
               prefixIcon: const Icon(Icons.person_outline, color: NebahColors.cobaltBlue),
               filled: true,
               fillColor: isDark ? const Color(0xFF1E293B) : Colors.grey.shade100,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -441,16 +451,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 16),
+          Text(
+            'Phone Number (SMS Enabled)',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: isDark ? NebahColors.slateGrey : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 6),
           TextField(
             controller: _contactPhoneController,
             keyboardType: TextInputType.phone,
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 15),
             decoration: InputDecoration(
-              labelText: 'Phone Number (SMS Enabled)',
-              labelStyle: TextStyle(color: isDark ? NebahColors.slateGrey : Colors.black54),
+              hintText: 'e.g. +234 803 123 4567',
+              hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.black38),
               prefixIcon: const Icon(Icons.phone_outlined, color: NebahColors.cobaltBlue),
               filled: true,
               fillColor: isDark ? const Color(0xFF1E293B) : Colors.grey.shade100,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -458,6 +478,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 24),
+
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(

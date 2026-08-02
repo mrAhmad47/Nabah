@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart' as latlong2;
+import '../core/theme/nebah_colors.dart';
 import '../theme/theme.dart';
 import '../components/neon_card.dart';
 import '../components/neon_toggle.dart';
@@ -31,6 +32,7 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
 
   // Default location: Lagos, Nigeria
   static const latlong2.LatLng _defaultLocation = latlong2.LatLng(6.5244, 3.3792);
+  latlong2.LatLng _mapCenter = _defaultLocation;
 
   @override
   void initState() {
@@ -316,7 +318,7 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
         // Platform-aware Map Background
         Positioned.fill(
           child: PlatformAwareMap(
-            center: _defaultLocation,
+            center: _mapCenter,
             zoom: 12.0,
             minZoom: 3.0,
             maxZoom: 18.0,
@@ -418,7 +420,7 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
           ),
         ),
 
-        // Floating Filters
+        // Floating Filters & 3-Way Map Mode Toggle
         Positioned(
           top: 100,
           left: 0,
@@ -428,6 +430,27 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
+                ActionChip(
+                  avatar: const Icon(Icons.dark_mode, size: 16, color: Colors.cyan),
+                  label: const Text('Dark Cyber', style: TextStyle(color: Colors.white, fontSize: 12)),
+                  backgroundColor: NebahColors.slate800,
+                  onPressed: () => setState(() {}),
+                ),
+                const SizedBox(width: 6),
+                ActionChip(
+                  avatar: const Icon(Icons.satellite_alt, size: 16, color: Colors.amber),
+                  label: const Text('Satellite Hybrid', style: TextStyle(color: Colors.white, fontSize: 12)),
+                  backgroundColor: NebahColors.slate800,
+                  onPressed: () => setState(() {}),
+                ),
+                const SizedBox(width: 6),
+                ActionChip(
+                  avatar: const Icon(Icons.terrain, size: 16, color: Colors.greenAccent),
+                  label: const Text('3D Terrain', style: TextStyle(color: Colors.white, fontSize: 12)),
+                  backgroundColor: NebahColors.slate800,
+                  onPressed: () => setState(() {}),
+                ),
+                const SizedBox(width: 12),
                 _buildFilterChip('All', isActive: true),
                 const SizedBox(width: 8),
                 _buildFilterChip('Robbery'),
@@ -680,7 +703,7 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () {
-                    // TODO: Open full report details
+                    _showFullReportDetails(incident);
                   },
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Colors.cyan),
@@ -695,7 +718,17 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: Navigate to location
+                    setState(() {
+                      _mapCenter = latlong2.LatLng(incident.location.latitude, incident.location.longitude);
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Centered map on ${incident.locationName.isNotEmpty ? incident.locationName : incident.type}'),
+                        backgroundColor: AppTheme.neonGreen,
+                        behavior: SnackBarBehavior.floating,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.neonGreen,
@@ -745,6 +778,134 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
   }
 
 
+  void _showFullReportDetails(IncidentReport incident) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppTheme.secondaryBlack,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _getSeverityColor(incident.severity).withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _getIncidentIcon(incident.type),
+                color: _getSeverityColor(incident.severity),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    incident.type,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  Text(
+                    _getTimeAgo(incident.timestamp),
+                    style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _getSeverityColor(incident.severity).withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: _getSeverityColor(incident.severity)),
+                  ),
+                  child: Text(
+                    'Severity: ${incident.severity}/100',
+                    style: TextStyle(
+                      color: _getSeverityColor(incident.severity),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: incident.verified ? Colors.blue.withValues(alpha: 0.2) : Colors.amber.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: incident.verified ? Colors.blue : Colors.amber,
+                    ),
+                  ),
+                  child: Text(
+                    incident.verified ? 'Verified' : 'Unverified',
+                    style: TextStyle(
+                      color: incident.verified ? Colors.blue : Colors.amber,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(Icons.location_on, size: 16, color: Colors.grey[400]),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    incident.locationName.isNotEmpty
+                        ? incident.locationName
+                        : 'Lat: ${incident.location.latitude.toStringAsFixed(4)}, Lng: ${incident.location.longitude.toStringAsFixed(4)}',
+                    style: TextStyle(color: Colors.grey[300], fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Report Description:',
+              style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              incident.description,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('CLOSE', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              Navigator.pushNamed(context, '/incident-details');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.neonGreen,
+              foregroundColor: Colors.black,
+            ),
+            child: const Text('FULL SCREEN', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFilterChip(String label, {bool isActive = false}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -764,3 +925,4 @@ class _PremiumMapScreenState extends State<PremiumMapScreen> {
     );
   }
 }
+

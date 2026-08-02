@@ -6,15 +6,26 @@ import 'platform_map_stub.dart'
     if (dart.library.io) 'platform_map_io.dart'
     if (dart.library.html) 'platform_map_web.dart';
 
-/// A platform-aware map widget that uses:
-/// - MapLibre GL on Android, iOS, and Web
-/// - flutter_map on Windows, macOS, and Linux
+/// Map display modes
+enum MapTypeMode {
+  /// Google Earth Satellite imagery + Neighborhood boundaries & street labels
+  hybrid,
+  /// Pure Google Earth Satellite imagery
+  satellite,
+  /// Standard vector roadmap
+  normal,
+  /// Terrain map
+  terrain,
+}
+
+/// A platform-aware map widget that uses Google Maps with support for Google Earth / Hybrid satellite views.
 class PlatformAwareMap extends StatelessWidget {
   final latlong2.LatLng center;
   final double zoom;
   final double minZoom;
   final double maxZoom;
   final String? styleUrl;
+  final MapTypeMode mapType;
   final Function(dynamic controller)? onMapCreated;
   final VoidCallback? onStyleLoaded;
   final List<MapCircle>? circles;
@@ -22,7 +33,7 @@ class PlatformAwareMap extends StatelessWidget {
   final List<latlong2.LatLng>? polylinePoints;
   final Color polylineColor;
   final double polylineWidth;
-  final List<MapPolyline>? polylines; // New: Support multiple polylines
+  final List<MapPolyline>? polylines;
   final Function(latlong2.LatLng)? onTap;
   final Function(latlong2.LatLng)? onCameraMove;
   final VoidCallback? onCameraIdle;
@@ -34,6 +45,7 @@ class PlatformAwareMap extends StatelessWidget {
     this.minZoom = 3.0,
     this.maxZoom = 18.0,
     this.styleUrl,
+    this.mapType = MapTypeMode.hybrid,
     this.onMapCreated,
     this.onStyleLoaded,
     this.circles,
@@ -55,6 +67,7 @@ class PlatformAwareMap extends StatelessWidget {
       minZoom: minZoom,
       maxZoom: maxZoom,
       styleUrl: styleUrl,
+      mapType: mapType,
       onMapCreated: onMapCreated,
       onStyleLoaded: onStyleLoaded,
       circles: circles,

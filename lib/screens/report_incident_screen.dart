@@ -728,15 +728,10 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
         verified: false,
       );
 
-      // Save to database (skip on web for now)
+      // Save to platform-aware database (sqflite on native, in-memory store on web)
       try {
-        if (!kIsWeb) {
-          await IncidentDatabase.instance.insertIncident(report);
-          debugPrint('✅ Report saved to local database');
-        } else {
-          debugPrint('⚠️ Web platform - skipping database save (use Firebase in future)');
-          // TODO: Save to Firebase for web
-        }
+        await IncidentDatabase.instance.insertIncident(report);
+        debugPrint('✅ Report saved to database');
       } catch (dbError) {
         debugPrint('❌ Database error (non-critical): $dbError');
         // Continue anyway - report is created
